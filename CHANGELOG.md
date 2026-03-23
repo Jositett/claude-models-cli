@@ -8,29 +8,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-- Initial public release
-- Bun-based cross-platform CLI
-- OpenRouter provider with smart model scoring
-- Ollama provider support for local models
-- Quick launch shortcuts: `cm1` through `cm10`
-- Auto-fallback launcher: `cla`
-- Configuration management with `~/.claude-models-cli/`
-- Activity logging
-- Shell alias generation (bash, zsh, fish, PowerShell)
-- GitHub Actions CI for Windows, macOS, Linux
-- Comprehensive test suite with 8 passing tests
+- (v1.1.0 upcoming features)
 
 ### Changed
-- N/A (initial release)
+- N/A
 
 ### Deprecated
 - N/A
 
 ### Removed
-- PowerShell-only implementation (replaced with Bun/TypeScript)
+- N/A
 
 ### Fixed
-- N/A (initial release)
+- N/A
 
 ### Security
 - N/A
@@ -38,14 +28,43 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.0.0] - 2026-03-23
 
 ### Added
-- First stable release
-- Cross-platform support (Windows, macOS, Linux)
-- Model discovery from OpenRouter API
-- Configurable scoring for programming-focused models
-- Automatic model list updates (configurable interval)
-- Rate limit handling with auto-rotation
-- Complete documentation
-- MIT License
+- **Cross-platform CLI**: Built with Bun, works on macOS, Linux, Windows
+- **OpenRouter integration**: Fetches free models with smart scoring for coding tasks
+- **Ollama provider**: Support for local models (when Ollama is running)
+- **Quick launch shortcuts**: `cm1` through `cm10` for instant model access
+- **Auto-fallback launcher**: `cla` automatically tries models until one works
+- **Configuration management**: JSON-based config at `~/.claude-models-cli/`
+- **Activity logging**: Track usage and changes in `activity.log`
+- **Shell alias generation**: Supports bash, zsh, fish, and PowerShell
+- **JSON output**: `cm list --json` for scripting and automation
+- **Version and info commands**: `cm version`, `cm info` for debugging
+- **Improved error handling**: Specific messages for rate limits (429), auth (401), etc.
+- **Pre-commit hooks**: Run type checking and tests automatically
+- **Comprehensive documentation**: Usage guide, examples, troubleshooting
+- **GitHub repository**: Full open-source release with MIT License
+
+### Changed
+- N/A
+
+### Deprecated
+- N/A
+
+### Removed
+- PowerShell-only version (replaced with Bun/TypeScript)
+
+### Fixed
+- Cross-platform path handling (Windows/macOS/Linux)
+- Config directory creation on all platforms
+- Test isolation with `TEST_CONFIG_DIR` env override
+
+### Security
+- No hardcoded API keys
+- Config file kept in user's home directory
+- Optional logging respecting user privacy
+
+## [0.1.0] - Early Development (unreleased)
+- Initial prototype with PowerShell
+- Basic model fetching concept
 
 [Unreleased]: https://github.com/Jositett/claude-models-cli/compare/v1.0.0...HEAD
 [1.0.0]: https://github.com/Jositett/claude-models-cli/releases/tag/v1.0.0
