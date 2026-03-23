@@ -59,6 +59,15 @@ git push origin v1.0.0
 gh release create v1.0.0 --target master --title "v1.0.0" --notes "Full release notes..."
 ```
 
+### 8. Build System: tsc vs Bun Bundler
+- Bun's bundler (`bun build`) is designed for web bundles, not CLI tools
+- Node core modules (like `fs/promises`) don't bundle correctly with Bun
+- **Solution:** Use TypeScript compiler (`tsc`) for transpilation without bundling
+- This preserves Node built-in module resolution at runtime
+- Ensure all local imports use explicit `.js` extensions for `NodeNext` resolution
+- Set `"strict": false` if Bun-specific APIs cause false positive type errors
+- `noEmitOnError: false` ensures JS output even with type warnings
+
 ## User Experience Lessons
 
 ### 1. CLI Naming
