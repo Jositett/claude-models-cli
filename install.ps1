@@ -1,6 +1,6 @@
 #!/usr/bin/env pwsh
 # Claude Models CLI - Windows Installation Script (PowerShell)
-# Usage: irm https://raw.githubusercontent.com/YOURUSERNAME/claude-models-cli/main/install.ps1 | iex
+# Usage: irm https://raw.githubusercontent.com/Jositett/claude-models-cli/main/install.ps1 | iex
 
 $ErrorActionPreference = "Stop"
 
@@ -22,7 +22,7 @@ try {
     exit 1
 }
 
-$RepoUrl = "https://github.com/YOURUSERNAME/claude-models-cli"
+$RepoUrl = "https://github.com/Jositett/claude-models-cli"
 $ConfigDir = "$env:USERPROFILE\.claude-models-cli"
 
 # Clone repository if not exists

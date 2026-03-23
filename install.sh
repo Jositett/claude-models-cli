@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Claude Models CLI - Unix/Linux/macOS Installation Script
-# Usage: curl -fsSL https://raw.githubusercontent.com/YOURUSERNAME/claude-models-cli/main/install.sh | bash
+# Usage: curl -fsSL https://raw.githubusercontent.com/Jositett/claude-models-cli/main/install.sh | bash
 
 set -e
 
@@ -16,7 +16,7 @@ fi
 
 echo "✅ Bun detected: $(bun --version)"
 
-REPO_URL="https://github.com/YOURUSERNAME/claude-models-cli"
+REPO_URL="https://github.com/Jositett/claude-models-cli"
 CONFIG_DIR="$HOME/.claude-models-cli"
 INSTALL_DIR="${CLAUDE_MODELS_INSTALL_DIR:-$HOME/.claude-models-cli-repo}"
 
