@@ -25,6 +25,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Security
 - N/A
 
+## [1.4.0] - 2026-03-23
+
+### Added
+- **Configuration validation**: Full schema validation for config.json
+  - New `src/config/validation.ts` module
+  - `cm config validate` command to check config
+  - `cm config` subcommands: `edit` (default) and `validate`
+  - Validates types, ranges, enums, and nested provider settings
+  - Helpful error messages with suggestions for fixes
+  - Auto-normalization merges with defaults on valid partial configs
+  - 12 unit tests covering validation scenarios
+- **Improved error handling**: Config load failures now show clear validation errors before falling back to defaults
+
+### Changed
+- ConfigManager.loadConfig() now validates and normalizes config
+- Unknown fields are ignored (forward compatible)
+- Missing fields are filled from DEFAULT_CONFIG
+
+### Fixed
+- Prevents invalid config from causing obscure runtime errors
+
 ## [1.3.0] - 2026-03-23
 
 ### Added

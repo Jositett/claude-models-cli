@@ -50,10 +50,18 @@
 - [x] Applied to OllamaProvider (fetchModels)
 - [x] Added unit tests for retry logic (13 tests passing)
 
+### Completed for v1.4.0
+- [x] Config validation with JSON schema
+- [x] `cm config validate` command
+- [x] `cm config edit` subcommand (explicit)
+- [x] Normalization with defaults for missing fields
+- [x] Clear error messages with suggestions
+- [x] 12 unit tests for validation logic
+
 ---
 
 ## Current Status
-- ✅ **v1.3.0** - Latest release with retry logic
+- ✅ **v1.4.0** - Latest release with config validation
 - ⚠️ GitHub Actions: Billing lock prevents CI runners (workflow exists)
 - 🎯 Next: Future enhancements (see backlog)
 
