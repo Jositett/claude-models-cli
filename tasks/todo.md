@@ -35,10 +35,17 @@
 - [x] Recommended working models list
 - [x] Updated documentation (README, CHANGELOG, usage-guide)
 
+### Completed for v1.2.1
+- [x] Concurrency control (default 3) for faster probing
+- [x] `cm select` shows probe status indicators (✓/✗/?)
+- [x] Added `--only-working` flag to `cm select`
+- [x] Async loading of probe results (non-blocking)
+- [x] Legend for status indicators in select UI
+
 ---
 
 ## Current Status
-- ✅ **v1.2.0** - Latest release with model probing
+- ✅ **v1.2.1** - Latest release with probe integration
 - ⚠️ GitHub Actions: Billing lock prevents CI runners (workflow exists)
 - 🎯 Next: Future enhancements (see backlog)
 

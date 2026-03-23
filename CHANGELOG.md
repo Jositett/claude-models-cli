@@ -52,6 +52,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Security
 - N/A
 
+## [1.2.1] - 2026-03-23
+
+### Added
+- **Concurrency control**: Probe up to 3 models in parallel (configurable with `--concurrency`)
+- **Probe status in select**: `cm select` now shows ✓ (working), ✗ (failing), ? (not tested) indicators
+- **Filter by probe status**: `cm select --only-working` shows only successfully probed models
+- **Async probe loading**: Probe results load in background without slowing down select UI
+- **Status legend**: Added legend explaining the status indicators
+
+### Changed
+- Default probing concurrency increased from 1 to 3 for faster scans
+- Probe results caching remains 24h TTL
+
+### Fixed
+- Type safety improvements in ProbeManager result handling
+
 ## [1.1.0] - 2026-03-23
 
 ### Added
