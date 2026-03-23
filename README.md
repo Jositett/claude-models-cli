@@ -18,6 +18,8 @@ Built with [Bun](https://bun.sh) for maximum performance and compatibility acros
 - ⚡ **Quick launch** with `cm1`, `cm2`, `cm3`... `cm10` shortcuts (cm = Claude Models)
 - 🔄 **Auto-rotate** when rate limits hit
 - 🔌 **Multi-provider** support (OpenRouter, HuggingFace, Ollama)
+- 💾 **Model caching** - reduces API calls with TTL-based local cache
+- 🎯 **Interactive selection** - `cm select` for choosing models from TUI
 - 📊 **Activity logging** and usage tracking
 - 🛠️ **Smart defaults** for coding tasks
 - 🌍 **Cross-platform** - works on macOS, Linux, and Windows
@@ -90,7 +92,19 @@ cm version     # Show version
 cm info        # Show environment information
 cm list --json # Get machine-readable output for scripting
 cm --help      # Show all options
+
+# Cache management (new in v1.1.0)
+cm cache clear  # Clear the model cache
+cm cache stats  # Show cache statistics (entries, size)
 ```
+
+### Interactive Selection
+
+```bash
+cm select
+```
+
+Opens a text-based UI to choose a model interactively. Navigate with arrow keys and press Enter to launch your selected model. This is useful when you want to preview all available models with full details before choosing.
 
 ## Providers
 

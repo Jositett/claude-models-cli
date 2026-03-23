@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-- (v1.1.0 upcoming features)
+- N/A
 
 ### Changed
 - N/A
@@ -21,6 +21,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - N/A
+
+### Security
+- N/A
+
+## [1.1.0] - 2026-03-23
+
+### Added
+- **Model caching**: TTL-based local cache to reduce OpenRouter API calls
+- **Cache management commands**: `cm cache clear`, `cm cache stats`
+- **Interactive model selection**: `cm select` for choosing models from a TUI list
+- **Build system improvement**: Switched to TypeScript compilation for better compatibility
+
+### Changed
+- Build process: Now uses `tsc` instead of Bun bundler
+- Updated fs operations to use Node's `fs` module
+
+### Fixed
+- Bundled dist files now work correctly (was broken with Bun bundler)
+- Type safety improvements across codebase
 
 ### Security
 - N/A
