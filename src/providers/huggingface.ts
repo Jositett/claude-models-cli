@@ -1,4 +1,4 @@
-import { Model } from '../types';
+import { Model } from '../types.js';
 
 export class HuggingFaceProvider {
   async fetchModels(limit: number = 10): Promise<Model[]> {

@@ -1,5 +1,4 @@
-import { stat, readFile, writeFile, unlink } from 'fs/promises';
-import { existsSync } from 'fs';
+import { stat, readFile, writeFile, unlink, access } from 'fs/promises';
 
 export interface CacheEntry<T> {
   data: T;

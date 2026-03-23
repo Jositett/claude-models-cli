@@ -1,4 +1,4 @@
-import { Model } from '../types';
+import { Model } from '../types.js';
 
 export class OpenRouterProvider {
   private readonly API_URL = 'https://openrouter.ai/api/v1/models';
@@ -18,7 +18,7 @@ export class OpenRouterProvider {
         throw new Error(`OpenRouter API error: ${response.status} ${response.statusText}`);
       }
 
-      const data = await response.json();
+      const data: any = await response.json();
 
       // Filter free models
       const freeModels = data.data?.filter((model: any) => {
@@ -42,7 +42,7 @@ export class OpenRouterProvider {
         } as Model;
       });
 
-      return scoredModels.sort((a, b) => b.score - a.score).slice(0, limit);
+      return scoredModels.sort((a: Model, b: Model) => b.score - a.score).slice(0, limit);
     } catch (error) {
       console.error('Failed to fetch OpenRouter models:', error);
       return [];

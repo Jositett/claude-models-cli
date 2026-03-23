@@ -1,7 +1,6 @@
-import { Config, DEFAULT_CONFIG, getConfigDir } from './types';
-import { mkdir, readFile, writeFile, stat, access } from 'fs/promises';
-import { existsSync } from 'fs';
-import { CacheManager } from './cache';
+import { Config, DEFAULT_CONFIG, getConfigDir } from './types.js';
+import { readFile, writeFile, stat, access, mkdir } from 'fs/promises';
+import { CacheManager } from './cache.js';
 
 export class ConfigManager {
   private configDir: string;
@@ -102,7 +101,7 @@ export class ConfigManager {
 
     try {
       const stats = await stat(this.modelsFile);
-      const hoursSince = (Date.now() - stats.mtime) / (1000 * 60 * 60);
+      const hoursSince = (Date.now() - stats.mtime.getTime()) / (1000 * 60 * 60);
       return hoursSince >= updateIntervalHours;
     } catch {
       return true;

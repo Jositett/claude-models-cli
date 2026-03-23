@@ -1,3 +1,3 @@
-export { OpenRouterProvider } from './openrouter';
-export { OllamaProvider } from './ollama';
-export { HuggingFaceProvider } from './huggingface';
+export { OpenRouterProvider } from './openrouter.js';
+export { OllamaProvider } from './ollama.js';
+export { HuggingFaceProvider } from './huggingface.js';

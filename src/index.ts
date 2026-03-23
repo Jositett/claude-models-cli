@@ -1,8 +1,8 @@
-import { ConfigManager } from './config';
-import { Model, DEFAULT_CONFIG } from './types';
-import { OpenRouterProvider } from './providers/openrouter';
-import { OllamaProvider } from './providers/ollama';
-import { HuggingFaceProvider } from './providers/huggingface';
+import { ConfigManager } from './config.js';
+import { Model, DEFAULT_CONFIG } from './types.js';
+import { OpenRouterProvider } from './providers/openrouter.js';
+import { OllamaProvider } from './providers/ollama.js';
+import { HuggingFaceProvider } from './providers/huggingface.js';
 
 export class ClaudeModels {
   private configManager: ConfigManager;

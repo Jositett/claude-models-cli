@@ -1,8 +1,8 @@
 #!/usr/bin/env bun
 
-import { ClaudeModels } from './index';
-import { PKG_VERSION, PKG_NAME, REPO_URL } from './version';
-import { PKG_VERSION, PKG_NAME, REPO_URL } from './version';
+import { ClaudeModels } from './index.js';
+import { PKG_VERSION, PKG_NAME, REPO_URL } from './version.js';
+import { statSync, readFileSync } from 'fs';
 
 async function main() {
   const args = process.argv.slice(2);
@@ -164,9 +164,9 @@ function printEnvInfo(cm: ClaudeModels) {
   console.log(`Bun version: ${Bun.version}`);
   console.log(`Node compatible: ${process.version}`);
   try {
-    const stats = Bun.file(config.getModelsFile()).statSync();
+    const stats = statSync(config.getModelsFile());
     console.log(`Models last updated: ${stats.mtime}`);
-    console.log(`Number of models: ${JSON.parse(Bun.file(config.getModelsFile()).textSync()).length}`);
+    console.log(`Number of models: ${JSON.parse(readFileSync(config.getModelsFile(), 'utf-8')).length}`);
   } catch {
     console.log('Models: Not fetched yet');
   }
@@ -258,7 +258,7 @@ async function handleSelect(cm: ClaudeModels) {
       stdin.once('data', (data) => {
         stdin.setRawMode?.(false);
         stdin.pause();
-        resolve(data.trim());
+        resolve(data.toString().trim());
       });
     });
 

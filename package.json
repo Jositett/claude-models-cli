@@ -10,15 +10,15 @@
   },
   "scripts": {
     "prepublishOnly": "bun run build",
-    "build": "bun build ./src/cli.ts --outdir ./dist && bun build ./src/index.ts --outdir ./dist",
-    "build:cli": "bun build ./src/cli.ts --outdir ./dist",
-    "build:lib": "bun build ./src/index.ts --outdir ./dist",
+    "build": "bun x tsc",
+    "build:cli": "bun x tsc",
+    "build:lib": "bun x tsc",
     "dev": "bun --watch ./src/cli.ts",
     "start": "bun ./dist/cli.js",
     "test": "bun test",
     "test:coverage": "bun test --coverage",
-    "types": "tsc --noEmit",
-    "lint": "tsc --noEmit"
+    "types": "bun x tsc --noEmit",
+    "lint": "bun x tsc --noEmit"
   },
   "keywords": [
     "claude",
@@ -51,6 +51,8 @@
   "homepage": "https://github.com/YOURUSERNAME/claude-models-cli#readme",
   "dependencies": {},
   "devDependencies": {
-    "typescript": "^5.0.0"
+    "@types/bun": "^1.3.11",
+    "@types/node": "^25.5.0",
+    "typescript": "^5.9.3"
   }
 }

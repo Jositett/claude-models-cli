@@ -1,20 +1,25 @@
-import { Model } from '../types';
+import { Model } from '../types.js';
 
 export class OllamaProvider {
   private readonly API_URL = 'http://localhost:11434/api/tags';
 
   async fetchModels(limit: number = 10): Promise<Model[]> {
     try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 5000);
+
       const response = await fetch(this.API_URL, {
         method: 'GET',
-        timeout: 5000,
+        signal: controller.signal,
       });
+
+      clearTimeout(timeoutId);
 
       if (!response.ok) {
         return [];
       }
 
-      const data = await response.json();
+      const data: any = await response.json();
 
       const models = (data.models || [])
         .slice(0, limit)
