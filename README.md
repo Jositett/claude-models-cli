@@ -122,7 +122,16 @@ Opens a text-based UI to choose a model interactively. Navigate with arrow keys 
 
 ## Configuration
 
-Edit `~/.claude-models-cli/config.json`:
+The CLI uses a JSON configuration file at `~/.claude-models-cli/config.json`. You can create it manually or run `cm config edit` to open it in your editor.
+
+**Validate your config:**
+```bash
+cm config validate
+```
+
+This checks for common errors and provides suggestions for fixing them.
+
+**Example configuration:**
 
 ```json
 {

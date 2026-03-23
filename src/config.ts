@@ -1,6 +1,7 @@
 import { Config, DEFAULT_CONFIG, getConfigDir } from './types.js';
 import { readFile, writeFile, stat, access, mkdir } from 'fs/promises';
 import { CacheManager } from './cache.js';
+import { loadAndValidateConfig } from './config/validation.js';
 
 export class ConfigManager {
   private configDir: string;
@@ -66,9 +67,16 @@ export class ConfigManager {
   async loadConfig(): Promise<Config> {
     try {
       const content = await readFile(this.configFile, 'utf-8');
-      return JSON.parse(content) as Config;
-    } catch (error) {
-      console.error('Failed to load config:', error);
+      const rawConfig = JSON.parse(content);
+      return loadAndValidateConfig(rawConfig);
+    } catch (error: any) {
+      if (error.message?.includes('Invalid configuration')) {
+        // Validation error - log it clearly
+        console.error('❌ Configuration error:\n', error.message);
+        console.error('Using default configuration instead. Fix your config file at:', this.configFile);
+      } else {
+        console.error('Failed to load config:', error.message || error);
+      }
       return DEFAULT_CONFIG;
     }
   }

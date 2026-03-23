@@ -57,14 +57,41 @@ async function main() {
       break;
 
     case 'config':
-    case '--config':
-    case '-c':
-      const configPath = cm['configManager'].getConfigDir() + '/config.json';
-      if (process.platform === 'win32') {
-        import('child_process').then(({ exec }) => exec(`notepad "${configPath}"`));
-      } else {
-        const editor = process.env.EDITOR || 'nano';
-        import('child_process').then(({ spawn }) => spawn(editor, [configPath], { stdio: 'inherit' }));
+      // Handle config subcommands: config edit, config validate
+      const configSubCmd = args[1] || 'edit';
+      const configManager = cm['configManager'];
+
+      switch (configSubCmd) {
+        case 'edit':
+        case '--edit':
+          const configPath = configManager.getConfigDir() + '/config.json';
+          if (process.platform === 'win32') {
+            import('child_process').then(({ exec }) => exec(`notepad "${configPath}"`));
+          } else {
+            const editor = process.env.EDITOR || 'nano';
+            import('child_process').then(({ spawn }) => spawn(editor, [configPath], { stdio: 'inherit' }));
+          }
+          break;
+        case 'validate':
+        case '--validate':
+          try {
+            const config = await configManager.loadConfig();
+            console.log('✅ Configuration is valid');
+            console.log(`   Version: ${config.version}`);
+            console.log(`   Default provider: ${config.defaultProvider}`);
+            console.log(`   Max models: ${config.maxModels}`);
+            console.log(`   Auto-update: ${config.autoUpdate}`);
+          } catch (error: any) {
+            console.error('❌ Configuration validation failed:');
+            console.error(error.message);
+            process.exit(1);
+          }
+          break;
+        default:
+          console.log('Config commands:');
+          console.log('  cm config edit   - Edit configuration file (default)');
+          console.log('  cm config validate - Validate current configuration');
+          break;
       }
       break;
 
@@ -191,7 +218,8 @@ Commands:
   select              Interactive model selection
                       Options: --only-working (show only probed models)
   providers, -p       List configured providers
-  config, -c          Edit configuration file
+  config, -c          Edit configuration file (default)
+                      Subcommands: edit (default), validate
   logs, -L            View recent activity logs
   export, -e          Generate shell aliases (cm1-cm10, cla)
   version, -v         Show version
