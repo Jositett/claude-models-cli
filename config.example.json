@@ -1,0 +1,62 @@
+{
+  /**
+   * Claude Models CLI Configuration
+   * Copy this file to ~/.claude-models-cli/config.json and customize
+   *
+   * Get your OpenRouter API key: https://openrouter.ai/keys
+   */
+  "version": "1.0.0",
+
+  // Default provider to fetch models from
+  "defaultProvider": "openrouter",
+
+  // Auto-update models list after this many hours
+  "updateIntervalHours": 24,
+
+  // Maximum number of models to keep in the list (1-50)
+  "maxModels": 10,
+
+  // Preferred context for model scoring
+  // Options: "coding", "chat", "general"
+  "preferredContext": "coding",
+
+  // How to handle rate limits
+  // - "rotate": Try next model in list automatically
+  // - "fail": Stop and show error
+  // - "retry": Retry same model after delay
+  "rateLimitHandling": "rotate",
+
+  // Enable activity logging (recommended)
+  "logActivity": true,
+
+  // Enable debug logging (verbose output)
+  "debug": false,
+
+  // Provider-specific settings
+  "providers": {
+    "openrouter": {
+      "priority": 1,
+      "enabled": true,
+      // Optional: Filter models by these keywords
+      "includeKeywords": ["coder", "code", "programming", "dev"],
+      // Optional: Exclude models with these keywords
+      "excludeKeywords": ["uncensored", "nsfw"]
+    },
+    "ollama": {
+      "priority": 2,
+      "enabled": true,
+      "baseUrl": "http://localhost:11434"
+    },
+    "huggingface": {
+      "priority": 3,
+      "enabled": false,
+      "apiToken": ""
+    }
+  },
+
+  // Aliases to generate (cm1-cm10 always generated)
+  "aliases": {
+    "generateShellScript": true,
+    "autoSourceOnExport": false
+  }
+}

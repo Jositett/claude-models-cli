@@ -1,0 +1,14 @@
+# Bun configuration for claude-models-cli
+# See https://bun.sh/docs/bunrc
+
+# Load environment variables from .env file (if present)
+--env
+
+# Enable strict mode for better error catching
+--strict
+
+# Use Node's module resolution (compatible)
+--conditions=node
+
+# Preload for debugging (uncomment to enable)
+# --preload ./scripts/debug.ts

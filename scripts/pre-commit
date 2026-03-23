@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+# Pre-commit hook for Claude Models CLI
+# Runs type checking and tests before each commit
+
+set -e
+
+echo "🔍 Running pre-commit checks..."
+
+# Type checking
+echo "  📝 Type checking..."
+bun run types
+
+# Run tests
+echo "  🧪 Running tests..."
+bun test
+
+echo "✅ All checks passed! Ready to commit."
+exit 0

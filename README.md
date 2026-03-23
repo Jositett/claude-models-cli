@@ -1,11 +1,16 @@
 # Claude Models CLI 🚀
 
+> 🎯 Your shortcut to free AI models with Claude Code
+
 A cross-platform CLI tool for managing and launching [Claude Code](https://claude.ai/code) with free AI models from OpenRouter, HuggingFace, Ollama, and more.
 
 Built with [Bun](https://bun.sh) for maximum performance and compatibility across macOS, Linux, and Windows.
 
-![Bun](https://img.shields.io/badge/Bun-1.0+-purple.svg)
-![License](https://img.shields.io/badge/License-MIT-green.svg)
+[![Bun](https://img.shields.io/badge/Bun-1.0+-purple.svg)](https://bun.sh)
+[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+[![GitHub release](https://img.shields.io/github/v/release/Jositett/claude-models-cli)](https://github.com/Jositett/claude-models-cli/releases)
+[![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/Jositett/claude-models-cli/ci.yml?branch=main)](https://github.com/Jositett/claude-models-cli/actions/workflows/ci.yml)
+[![codecov](https://codecov.io/gh/Jositett/claude-models-cli/branch/main/graph/badge.svg)](https://codecov.io/gh/Jositett/claude-models-cli)
 
 ## Features
 
@@ -25,15 +30,22 @@ Built with [Bun](https://bun.sh) for maximum performance and compatibility acros
 ### Install
 ```bash
 # Clone and install
-git clone https://github.com/YOURUSERNAME/claude-models-cli.git
+git clone https://github.com/Jositett/claude-models-cli.git
 cd claude-models-cli
 bun install
 bun run build
 ```
 
-### One-line (power users)
+### One-line installers
+
+**Unix/Linux/macOS:**
 ```bash
-curl -fsSL https://raw.githubusercontent.com/YOURUSERNAME/claude-models-cli/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/Jositett/claude-models-cli/main/install.sh | bash
+```
+
+**Windows PowerShell:**
+```powershell
+irm https://raw.githubusercontent.com/Jositett/claude-models-cli/main/install.ps1 | iex
 ```
 
 ## Usage
