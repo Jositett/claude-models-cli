@@ -38,12 +38,17 @@ export const DEFAULT_CONFIG: Config = {
 };
 
 export function getConfigDir(): string {
-  if (typeof Bun !== 'undefined') {
-    return Bun.get env('HOME') + '/.claude-models-cli' ||
-           Bun.get env('USERPROFILE') + '\\.claude-models-cli' ||
-           './.claude-models-cli';
+  // Allow override for testing
+  if (process.env.TEST_CONFIG_DIR) {
+    return process.env.TEST_CONFIG_DIR;
   }
-  // Fallback for non-Bun environments
-  const home = process.env.HOME || process.env.USERPROFILE || './';
-  return home + '/.claude-models-cli';
+
+  // Use process.env which works in both Bun and Node
+  const isWin = process.platform === 'win32';
+  const home = process.env.HOME || process.env.USERPROFILE || (isWin ? process.env.USERPROFILE : process.env.HOME) || './';
+  const sep = isWin ? '\\' : '/';
+
+  // Ensure no trailing separator to avoid double sep
+  const cleanHome = home.endsWith(sep) ? home.slice(0, -1) : home;
+  return `${cleanHome}${sep}.claude-models-cli`;
 }

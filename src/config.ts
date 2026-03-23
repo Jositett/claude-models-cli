@@ -1,4 +1,6 @@
 import { Config, DEFAULT_CONFIG, getConfigDir } from './types';
+import { mkdir, readFile, writeFile, stat, access } from 'fs/promises';
+import { existsSync } from 'fs';
 
 export class ConfigManager {
   private configDir: string;
@@ -36,10 +38,11 @@ export class ConfigManager {
   async initialize(): Promise<Config> {
     // Ensure config directory exists
     try {
-      await Bun.write(this.configDir, '');
-    } catch (error) {
-      // Directory might already exist
-      if (!(await this.dirExists(this.configDir))) {
+      await mkdir(this.configDir, { recursive: true });
+    } catch (error: any) {
+      // EEXIST is fine - directory already exists
+      if (error?.code !== 'EEXIST' && !(await this.dirExists(this.configDir))) {
+        console.error('Failed to create config directory:', error);
         throw error;
       }
     }
@@ -56,7 +59,7 @@ export class ConfigManager {
 
   async loadConfig(): Promise<Config> {
     try {
-      const content = await Bun.file(this.configFile).text();
+      const content = await readFile(this.configFile, 'utf-8');
       return JSON.parse(content) as Config;
     } catch (error) {
       console.error('Failed to load config:', error);
@@ -65,7 +68,7 @@ export class ConfigManager {
   }
 
   async saveConfig(config: Config): Promise<void> {
-    await Bun.file(this.configFile).write(JSON.stringify(config, null, 2));
+    await writeFile(this.configFile, JSON.stringify(config, null, 2), 'utf-8');
   }
 
   async loadModels(): Promise<any[] | null> {
@@ -73,7 +76,7 @@ export class ConfigManager {
       if (!(await this.fileExists(this.modelsFile))) {
         return null;
       }
-      const content = await Bun.file(this.modelsFile).text();
+      const content = await readFile(this.modelsFile, 'utf-8');
       return JSON.parse(content);
     } catch (error) {
       console.error('Failed to load models:', error);
@@ -82,7 +85,7 @@ export class ConfigManager {
   }
 
   async saveModels(models: any[]): Promise<void> {
-    await Bun.file(this.modelsFile).write(JSON.stringify(models, null, 2));
+    await writeFile(this.modelsFile, JSON.stringify(models, null, 2), 'utf-8');
   }
 
   async shouldUpdate(updateIntervalHours: number): Promise<boolean> {
@@ -91,7 +94,7 @@ export class ConfigManager {
     }
 
     try {
-      const stats = await Bun.stat(this.modelsFile);
+      const stats = await stat(this.modelsFile);
       const hoursSince = (Date.now() - stats.mtime) / (1000 * 60 * 60);
       return hoursSince >= updateIntervalHours;
     } catch {
@@ -100,9 +103,10 @@ export class ConfigManager {
   }
 
   async log(message: string): Promise<void> {
+    // Ensure log file exists
     if (!(await this.fileExists(this.logFile))) {
       try {
-        await Bun.write(this.logFile, '');
+        await writeFile(this.logFile, '');
       } catch {
         // Directory might not exist, but that's okay
       }
@@ -112,7 +116,8 @@ export class ConfigManager {
     const logMessage = `[${timestamp}] ${message}\n`;
 
     try {
-      await Bun.write(this.logFile, logMessage, { append: true });
+      // Append to file
+      await writeFile(this.logFile, logMessage, { encoding: 'utf-8', flag: 'a' });
     } catch (error) {
       console.error('Failed to write log:', error);
     }
@@ -120,7 +125,7 @@ export class ConfigManager {
 
   private async fileExists(path: string): Promise<boolean> {
     try {
-      await Bun.stat(path);
+      await access(path);
       return true;
     } catch {
       return false;
@@ -129,8 +134,8 @@ export class ConfigManager {
 
   private async dirExists(path: string): Promise<boolean> {
     try {
-      const stats = await Bun.stat(path);
-      return stats.type === 'directory';
+      const stats = await stat(path);
+      return stats.isDirectory();
     } catch {
       return false;
     }
