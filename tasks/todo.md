@@ -1,56 +1,89 @@
 # Claude Models CLI - Development Tasks
 
+## ✅ v1.0.0 Released (2026-03-23)
+
+**Release:** https://github.com/Jositett/claude-models-cli/releases/tag/v1.0.0
+
+### Completed for v1.0.0
+- [x] Bun-based cross-platform CLI (macOS, Linux, Windows)
+- [x] OpenRouter provider with smart model scoring
+- [x] Quick launch shortcuts: `cm1`-`cm10`
+- [x] Auto-fallback launcher: `cla`
+- [x] `cm version` and `cm info` commands
+- [x] JSON output support (`cm list --json`)
+- [x] Improved error handling (rate limits, auth errors)
+- [x] Shell alias generation (bash/zsh/fish/PowerShell)
+- [x] Activity logging and configuration management
+- [x] Comprehensive documentation (usage guide, changelog, examples)
+- [x] Pre-commit hooks (type check + tests)
+- [x] Manual release process (Git tag + GitHub release)
+- [x] GitHub repository configured with GitHub Actions (CI/CD workflow)
+- [x] Repository: https://github.com/Jositett/claude-models-cli
+
+---
+
 ## Current Status
-- ✅ Bun-based cross-platform CLI built
-- ✅ OpenRouter provider working
-- ✅ Tests passing (8 tests)
-- ✅ GitHub repository live: https://github.com/Jositett/claude-models-cli
-- ✅ Documentation complete
+- ✅ **v1.0.0** - First stable release published
+- ⚠️ GitHub Actions: Billing lock prevents CI runners (workflow exists)
+- 🎯 Next: v1.1.0 features and improvements
 
-## Active Tasks
+## In Progress (v1.1.0 Planning)
 
-### Priority 1: Essential Improvements
-- [ ] **CLAUDE.md**: Update project instructions to reflect Bun/TypeScript architecture
-- [ ] **README badges**: Add build status, license, Bun version badges
-- [ ] **Add .bunrc** or bunfig.toml for Bun configuration
-- [ ] **Create example config** with comments for users
-- [ ] **Add error handling** for API failures (rate limiting, network issues)
-- [ ] **Implement model caching** to reduce API calls
+### Priority 1: Quality of Life
+- [ ] **Model caching**: Reduce OpenRouter API calls with local cache
+- [ ] **Config validation**: JSON schema for config.json
+- [ ] **Retry logic**: Exponential backoff for transient failures
+- [ ] **Better help**: Add examples to `cm --help`
+- [ ] **Installation verification**: Check Bun dependency before install
 
-### Priority 2: Missing Features
-- [ ] **Ollama provider**: Make it actually work (test local Ollama integration)
-- [ ] **HuggingFace provider**: Implement the stub
-- [ ] **Model filtering**: Allow filtering by context size, provider, etc.
-- [ ] **Model search**: grep/search through available models
-- [ ] **JSON output**: Add `--json` flag for machine-readable output
-- [ ] **Version command**: Show version and environment info
+### Priority 2: Provider Enhancements
+- [ ] **Ollama**: Test and document local model usage
+- [ ] **HuggingFace**: Implement real API integration
+- [ ] **Provider priority**: Configure which provider to try first
+- [ ] **Provider health**: Track success/failure rates per provider
 
-### Priority 3: Developer Experience
-- [ ] **Pre-commit hooks**: Run tests and type check before commits
-- [ ] **GitHub Actions**: Add CI badge to README
-- [ ] **Contributing guide**: More detailed development workflow
-- [ ] **CHANGELOG.md**: Track version changes
-- [ ] **Documentation**: Create docs/usage-guide.md with examples
+### Priority 3: Filtering & UX
+- [ ] **Model filtering**: Filter list by provider, context size, score
+- [ ] **Model search**: Search through model names/descriptions
+- [ ] **Selection prompt**: Interactive `cm select` to choose model
+- [ ] **Color customization**: Respect NO_COLOR env var
 
-### Priority 4: Advanced Features (Nice to have)
-- [ ] **Benchmark mode**: Test model response times
-- [ ] **Configuration validation**: Schema validation for config.json
-- [ ] **Migration system**: Handle config migrations between versions
+### Priority 4: Advanced Features
+- [ ] **Benchmark mode**: Measure model response times
+- [ ] **Config migrations**: Auto-upgrade config between versions
 - [ ] **Telemetry opt-in**: Anonymous usage stats (GDPR compliant)
 
-## Completed Tasks
+## Completed Tasks (v1.0.0)
 - [x] Convert PowerShell to Bun/TypeScript
 - [x] Change shortcuts from cl1-cl10 to cm1-cm10
-- [x] Write comprehensive tests
+- [x] Write comprehensive tests (8 passing)
 - [x] Create install.sh for Unix/Linux/macOS
 - [x] Create install.ps1 for Windows
-- [x] Setup GitHub Actions CI/CD
+- [x] Add .bunrc for Bun configuration
+- [x] Add pre-commit hooks
+- [x] Create docs/usage-guide.md
+- [x] Create CHANGELOG.md
+- [x] Create config.example.json
+- [x] Implement JSON output flag
+- [x] Add version and info commands
+- [x] Improved error handling (rate limit, auth)
 - [x] Push to GitHub (Jositett/claude-models-cli)
+- [x] Create v1.0.0 release
 
-## Backlog / Future
+## Backlog / Future (v2.0.0+)
 - [ ] VS Code extension
 - [ ] Homebrew formula
 - [ ] Windows scoop installer
 - [ ] Docker image
-- [ ] Multiple provider failover (smart rotation)
+- [ ] Multiple provider smart failover
 - [ ] Model performance history
+- [ ] Web UI for model management
+- [ ] Plugin system for custom providers
+- [ ] Model benchmark comparisons
+- [ ] Community model rankings
+
+## Notes
+- GitHub Actions blocked by billing issue (account lock). Workflow exists but won't run until billing resolved.
+- For now, use manual releases via git tag + gh release create.
+- CI would ideally run tests on push and auto-publish releases.
+

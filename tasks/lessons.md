@@ -38,6 +38,26 @@
 - Test on multiple OS matrices (ubuntu, windows, macos)
 - Build before publishing releases
 - Use `softprops/action-gh-release` for releases (not deprecated `actions/create-release`)
+- **Important:** GitHub Actions require billing to be enabled on account. New accounts may have a lock until payment method added. Manual releases via `gh release create` still work.
+
+### 7. Manual Release Process
+When CI is unavailable:
+```bash
+# 1. Ensure all tests pass
+bun test
+
+# 2. Build the project
+bun run build
+
+# 3. Create annotated tag
+git tag -a v1.0.0 -m "Release v1.0.0: Description"
+
+# 4. Push the tag
+git push origin v1.0.0
+
+# 5. Create GitHub release
+gh release create v1.0.0 --target master --title "v1.0.0" --notes "Full release notes..."
+```
 
 ## User Experience Lessons
 
