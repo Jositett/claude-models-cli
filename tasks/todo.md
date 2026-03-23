@@ -30,7 +30,7 @@
 ## In Progress (v1.1.0 Planning)
 
 ### Priority 1: Quality of Life
-- [ ] **Model caching**: Reduce OpenRouter API calls with local cache
+- [x] **Model caching**: Reduce OpenRouter API calls with local cache
 - [ ] **Config validation**: JSON schema for config.json
 - [ ] **Retry logic**: Exponential backoff for transient failures
 - [ ] **Better help**: Add examples to `cm --help`
@@ -45,7 +45,7 @@
 ### Priority 3: Filtering & UX
 - [ ] **Model filtering**: Filter list by provider, context size, score
 - [ ] **Model search**: Search through model names/descriptions
-- [ ] **Selection prompt**: Interactive `cm select` to choose model
+- [x] **Selection prompt**: Interactive `cm select` to choose model
 - [ ] **Color customization**: Respect NO_COLOR env var
 
 ### Priority 4: Advanced Features
