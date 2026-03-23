@@ -1,6 +1,7 @@
 import { Config, DEFAULT_CONFIG, getConfigDir } from './types';
 import { mkdir, readFile, writeFile, stat, access } from 'fs/promises';
 import { existsSync } from 'fs';
+import { CacheManager } from './cache';
 
 export class ConfigManager {
   private configDir: string;
@@ -9,6 +10,7 @@ export class ConfigManager {
   private providersFile: string;
   private aliasesFile: string;
   private logFile: string;
+  private cacheManager: CacheManager;
 
   constructor() {
     this.configDir = getConfigDir();
@@ -17,6 +19,7 @@ export class ConfigManager {
     this.providersFile = `${this.configDir}/providers.json`;
     this.aliasesFile = `${this.configDir}/aliases.sh`;
     this.logFile = `${this.configDir}/activity.log`;
+    this.cacheManager = new CacheManager(this.configDir);
   }
 
   getConfigDir(): string {
@@ -33,6 +36,10 @@ export class ConfigManager {
 
   getLogFile(): string {
     return this.logFile;
+  }
+
+  getCacheManager(): CacheManager {
+    return this.cacheManager;
   }
 
   async initialize(): Promise<Config> {

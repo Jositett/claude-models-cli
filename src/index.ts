@@ -23,13 +23,22 @@ export class ClaudeModels {
 
   async updateModels(force: boolean = false, providers: string[] = ['openrouter']): Promise<Model[]> {
     const config = await this.configManager.loadConfig();
+    const cache = this.configManager.getCacheManager();
 
-    // Check if update is needed
-    const shouldUpdate = force || (await this.configManager.shouldUpdate(config.updateIntervalHours));
+    // If not forcing and we have fresh models file, use it
+    if (!force) {
+      const shouldUpdate = await this.configManager.shouldUpdate(config.updateIntervalHours);
+      if (!shouldUpdate) {
+        console.log('Models list is recent. Use --force to update anyway.');
+        return this.configManager.loadModels();
+      }
 
-    if (!shouldUpdate) {
-      console.log('Models list is recent. Use --force to update anyway.');
-      return this.configManager.loadModels();
+      // Also check cache for faster response
+      const cachedModels = await cache.get<Model[]>('all_models');
+      if (cachedModels && Array.isArray(cachedModels) && cachedModels.length > 0) {
+        console.log('Using cached models (fresh from memory).');
+        return cachedModels;
+      }
     }
 
     console.log('Fetching latest free models...');
@@ -39,8 +48,21 @@ export class ClaudeModels {
     for (const providerName of providers) {
       const provider = this.providers.get(providerName.toLowerCase());
       if (provider) {
-        const models = await provider.fetchModels(config.maxModels);
-        allModels.push(...models);
+        // Check cache for this provider first
+        const cacheKey = `models_${providerName}_${config.maxModels}`;
+        const cached = await cache.get<Model[]>(cacheKey);
+
+        if (cached && Array.isArray(cached) && cached.length > 0 && !force) {
+          console.log(`  ✓ Using cached ${providerName} models (${cached.length} models)`);
+          allModels.push(...cached);
+        } else {
+          const models = await provider.fetchModels(config.maxModels);
+          if (models && models.length > 0) {
+            // Cache the provider results (1 hour TTL)
+            await cache.set(cacheKey, models, 60 * 60 * 1000);
+            allModels.push(...models);
+          }
+        }
       } else {
         console.warn(`Unknown provider: ${providerName}`);
       }
@@ -59,6 +81,9 @@ export class ClaudeModels {
     }));
 
     await this.configManager.saveModels(rankedWithRanks);
+
+    // Cache the final ranked models for quick access
+    await cache.set('all_models', rankedWithRanks, config.updateIntervalHours * 60 * 60 * 1000);
 
     if (config.logActivity) {
       await this.configManager.log(

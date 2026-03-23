@@ -100,6 +100,37 @@ async function main() {
       printEnvInfo(cm);
       break;
 
+    case 'cache':
+      // Handle cache subcommands: cm cache clear, cm cache stats
+      const cacheSubCmd = args[1];
+      const cacheManager = cm['configManager'].getCacheManager();
+
+      switch (cacheSubCmd) {
+        case 'clear':
+        case '--clear':
+          await cacheManager.clear();
+          console.log('✅ Cache cleared');
+          break;
+        case 'stats':
+        case '--stats':
+          const stats = await cacheManager.getStats();
+          console.log('\n📊 Cache Statistics:\n');
+          console.log(`  Entries: ${stats.entries}`);
+          console.log(`  Size: ${(stats.size / 1024).toFixed(2)} KB`);
+          break;
+        default:
+          console.log('Cache commands:');
+          console.log('  cm cache clear  - Clear the model cache');
+          console.log('  cm cache stats  - Show cache statistics');
+          break;
+      }
+      break;
+
+    case 'select':
+      // Interactive model selection
+      await handleSelect(cm);
+      break;
+
     case 'help':
     case '--help':
     case '-h':
@@ -151,12 +182,15 @@ Usage: cm <command> [options]
 Commands:
   update, -u          Fetch and rank latest free models
   list, -l            Show current top 10 models
+  select              Interactive model selection
   providers, -p       List configured providers
   config, -c          Edit configuration file
   logs, -L            View recent activity logs
   export, -e          Generate shell aliases (cm1-cm10, cla)
   version, -v         Show version
   info, -i            Show environment information
+  cache               Manage model cache
+                      Subcommands: clear, stats
   help, -h            Show this help message
 
 Options:
@@ -187,6 +221,74 @@ Providers:
 GitHub: ${REPO_URL}
 License: MIT
 `);
+}
+
+async function handleSelect(cm: ClaudeModels) {
+  try {
+    const models = await cm.getModels();
+
+    if (models.length === 0) {
+      console.log('No models available. Run "cm update" first.');
+      return;
+    }
+
+    console.log('\n🔝 Select a Model:\n');
+    console.log('================================\n');
+
+    // Display models
+    for (const model of models) {
+      const rank = `[${model.rank}]`.padEnd(4);
+      const id = model.id.padEnd(40);
+      const context = model.contextLength ? `${Math.round(model.contextLength / 1000)}K`.padEnd(5) : 'N/A'.padEnd(5);
+      console.log(`${rank} ${cyan(id)} ${gray(context)} - ${white(model.description || 'Free tier model')}`);
+    }
+
+    console.log('\n  0) Cancel');
+
+    // Prompt for selection
+    console.log('\nEnter model number (1-' + models.length + '):');
+
+    // Simple readline implementation
+    const { stdin, stdout } = process;
+    stdin.setRawMode?.(true);
+    stdin.resume();
+    stdin.setEncoding('utf8');
+
+    const prompt = new Promise<string>((resolve) => {
+      stdin.once('data', (data) => {
+        stdin.setRawMode?.(false);
+        stdin.pause();
+        resolve(data.trim());
+      });
+    });
+
+    const choice = await prompt;
+    const num = parseInt(choice);
+
+    if (isNaN(num) || num < 1 || num > models.length) {
+      console.log('Cancelled or invalid selection.');
+      return;
+    }
+
+    const selected = models.find(m => m.rank === num);
+    if (selected) {
+      console.log(`\n✅ Selected: ${selected.id}`);
+      console.log(`   Score: ${selected.score}`);
+      console.log(`   Provider: ${selected.provider}`);
+
+      // Set as environment variable for current session
+      console.log(`\n💡 To use this model, run:`);
+      console.log(`   export ANTHROPIC_MODEL="${selected.id}"`);
+      console.log(`   claude`);
+
+      // Also create a quick alias file suggestion
+      const aliasName = `cm-selected`;
+      console.log(`\n📝 Or create a shortcut:`);
+      console.log(`   function ${aliasName}() { export ANTHROPIC_MODEL="${selected.id}"; claude "$@"; }`);
+    }
+  } catch (error: any) {
+    console.error('❌ Selection failed:', error.message);
+  }
 }
 
 // ANSI color codes for terminal output

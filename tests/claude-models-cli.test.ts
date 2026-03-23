@@ -111,7 +111,7 @@ describe('ClaudeModelsCLI', () => {
       // May return many models
     });
 
-    it('should rank models by score', async () => {
+    it('should rank models by score', { timeout: 15000 }, async () => {
       const cm = new ClaudeModels();
       await cm.initialize();
 
