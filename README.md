@@ -8,9 +8,9 @@ Built with [Bun](https://bun.sh) for maximum performance and compatibility acros
 
 [![Bun](https://img.shields.io/badge/Bun-1.0+-purple.svg)](https://bun.sh)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
-[![GitHub release](https://img.shields.io/github/v/release/Jositett/claude-models-cli)](https://github.com/Jositett/claude-models-cli/releases)
-[![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/Jositett/claude-models-cli/ci.yml?branch=main)](https://github.com/Jositett/claude-models-cli/actions/workflows/ci.yml)
-[![codecov](https://codecov.io/gh/Jositett/claude-models-cli/branch/main/graph/badge.svg)](https://codecov.io/gh/Jositett/claude-models-cli)
+[![GitHub release](https://img.shields.io/github/v/release/Jositett/claude-models-cli.svg)](https://github.com/Jositett/claude-models-cli/releases)
+[![GitHub issues](https://img.shields.io/github/issues/Jositett/claude-models-cli.svg)](https://github.com/Jositett/claude-models-cli/issues)
+[![GitHub last commit](https://img.shields.io/github/last-commit/Jositett/claude-models-cli.svg)](https://github.com/Jositett/claude-models-cli/commits/main)
 
 ## Features
 
@@ -21,6 +21,9 @@ Built with [Bun](https://bun.sh) for maximum performance and compatibility acros
 - 📊 **Activity logging** and usage tracking
 - 🛠️ **Smart defaults** for coding tasks
 - 🌍 **Cross-platform** - works on macOS, Linux, and Windows
+- 📄 **JSON output** for scripting and automation (`cm list --json`)
+- ℹ️ **Environment info** with `cm info` for debugging
+- 🎯 **Explicit rate limit messages** - know exactly what's wrong
 
 ## Quick Start
 
@@ -83,6 +86,9 @@ cm providers   # Show configured providers
 cm config      # Edit configuration
 cm logs        # View recent activity
 cm export      # (Re)generate alias scripts
+cm version     # Show version
+cm info        # Show environment information
+cm list --json # Get machine-readable output for scripting
 cm --help      # Show all options
 ```
 
