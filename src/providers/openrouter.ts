@@ -1,4 +1,5 @@
 import { Model } from '../types.js';
+import { ProbeResult } from '../probing.js';
 
 export class OpenRouterProvider {
   private readonly API_URL = 'https://openrouter.ai/api/v1/models';
@@ -46,6 +47,76 @@ export class OpenRouterProvider {
     } catch (error) {
       console.error('Failed to fetch OpenRouter models:', error);
       return [];
+    }
+  }
+
+  async testModel(modelId: string): Promise<ProbeResult> {
+    const startTime = Date.now();
+
+    try {
+      const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${process.env.OPENROUTER_API_KEY}`,
+          'HTTP-Referer': 'https://github.com/Jositett/claude-models-cli',
+        },
+        body: JSON.stringify({
+          model: modelId,
+          messages: [{ role: 'user', content: 'Hi' }],
+          max_tokens: 1,
+          stream: false,
+        }),
+      });
+
+      const responseTimeMs = Date.now() - startTime;
+
+      if (!response.ok) {
+        let errorMsg = `HTTP ${response.status}`;
+        try {
+          const errorData: any = await response.json();
+          errorMsg = errorData.error?.message || errorMsg;
+        } catch {
+          // Keep generic error
+        }
+
+        let status: 'fail' = 'fail';
+        // Provide more helpful error messages
+        if (response.status === 401) {
+          errorMsg = 'Unauthorized - check OPENROUTER_API_KEY';
+        } else if (response.status === 402) {
+          errorMsg = 'Insufficient credits - add credits to continue';
+        } else if (response.status === 429) {
+          errorMsg = 'Rate limit exceeded - try again later';
+        } else if (response.status === 404) {
+          errorMsg = 'Model not found (404)';
+        } else if (response.status === 400 && errorMsg.includes('max_tokens')) {
+          errorMsg = 'Model cannot generate (max_tokens exceeded)';
+        }
+
+        return {
+          modelId,
+          status: 'fail',
+          responseTimeMs,
+          error: errorMsg,
+          timestamp: Date.now(),
+        };
+      }
+
+      // Success!
+      return {
+        modelId,
+        status: 'ok',
+        responseTimeMs,
+        timestamp: Date.now(),
+      };
+    } catch (error: any) {
+      return {
+        modelId,
+        status: 'fail',
+        error: error.message || 'Network error',
+        timestamp: Date.now(),
+      };
     }
   }
 

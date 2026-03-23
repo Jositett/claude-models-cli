@@ -95,6 +95,11 @@ cm select
 cm cache stats    # Show cache statistics
 cm cache clear    # Clear the model cache
 
+# Model probing (NEW in v1.2.0)
+cm probe --limit 10          # Test top 10 models to see which work
+cm probe --limit 20 --force  # Test more, ignore cached results
+cm scan --json               # Get results as JSON
+
 # View recent activity
 cm logs
 

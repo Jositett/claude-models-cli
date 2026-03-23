@@ -81,6 +81,16 @@ After tag push:
 - Create GitHub release with detailed notes
 - Include upgrade instructions and changelog highlights
 
+### 10. Model Probing Implementation (v1.2.0)
+- **ProbeManager**: Separate class in `src/probing.ts` to manage probe lifecycle
+- **Caching**: Reuse CacheManager to store probe results with 24h TTL (`probe_results` key)
+- **Provider extension**: Add `testModel(modelId)` method to OpenRouterProvider
+- **CLI integration**: Add `probe` and `scan` commands; use existing command patterns
+- **Concurrency**: Started with sequential (1 at a time) to avoid rate limits; can add semaphore later
+- **Safety**: Use `max_tokens=1` to keep costs minimal (fractions of cent)
+- **User warning**: Display credits notice before probing starts
+- **Output**: Progressive results with ✓/✗, time, context; summary with top 3 recommendations
+
 ## User Experience Lessons
 
 ### 1. CLI Naming

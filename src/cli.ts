@@ -3,6 +3,7 @@
 import { ClaudeModels } from './index.js';
 import { PKG_VERSION, PKG_NAME, REPO_URL } from './version.js';
 import { statSync, readFileSync } from 'fs';
+import { ProbeManager } from './probing.js';
 
 async function main() {
   const args = process.argv.slice(2);
@@ -126,6 +127,11 @@ async function main() {
       }
       break;
 
+    case 'probe':
+    case 'scan':
+      await handleProbe(cm, args);
+      break;
+
     case 'select':
       // Interactive model selection
       await handleSelect(cm);
@@ -191,6 +197,8 @@ Commands:
   info, -i            Show environment information
   cache               Manage model cache
                       Subcommands: clear, stats
+  probe, scan         Test models to see which ones actually work
+                      Options: --limit N (default 10), --force, --json
   help, -h            Show this help message
 
 Options:
@@ -221,6 +229,62 @@ Providers:
 GitHub: ${REPO_URL}
 License: MIT
 `);
+}
+
+async function handleProbe(cm: ClaudeModels, args: string[]) {
+  try {
+    const models = await cm.getModels();
+
+    if (models.length === 0) {
+      console.log('No models available. Run "cm update" first.');
+      return;
+    }
+
+    // Parse options
+    const jsonFlag = args.includes('--json') || args.includes('-j');
+    const forceFlag = args.includes('--force');
+    const limitArg = args.find(arg => arg.startsWith('--limit='));
+    const limit = limitArg ? parseInt(limitArg.split('=')[1], 10) : 10;
+    const concurrencyArg = args.find(arg => arg.startsWith('--concurrency='));
+    const concurrency = concurrencyArg ? parseInt(concurrencyArg.split('=')[1], 10) : 1;
+
+    const actualCount = Math.min(models.length, limit);
+
+    // Cost warning
+    if (!jsonFlag) {
+      console.log('\n⚠️  Probing models may consume OpenRouter API credits.');
+      console.log(`   Will test up to ${actualCount} model(s) with max_tokens=1.`);
+      console.log('   Press Ctrl+C to cancel.\n');
+
+      // Simple confirmation (non-blocking, just a notice)
+      // In a future version we could add a --yes flag to skip this
+    }
+
+    try {
+      const config = cm['configManager'];
+      const cacheManager = config.getCacheManager();
+      const probeManager = new ProbeManager(config.getConfigDir(), cacheManager);
+
+      const results = await probeManager.probeAll(models, {
+        limit,
+        concurrency,
+        force: forceFlag,
+      });
+
+      if (jsonFlag) {
+        console.log(JSON.stringify({ results, summary: { tested: results.length, ok: results.filter(r => r.status === 'ok').length, failed: results.filter(r => r.status === 'fail').length } }, null, 2));
+      }
+    } catch (error: any) {
+      if (jsonFlag) {
+        console.error(JSON.stringify({ error: error.message }));
+        process.exit(1);
+      } else {
+        console.error('❌ Probing failed:', error.message);
+      }
+    }
+  } catch (error: any) {
+    console.error('❌ Error:', error.message);
+  }
 }
 
 async function handleSelect(cm: ClaudeModels) {

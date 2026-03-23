@@ -25,6 +25,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Security
 - N/A
 
+## [1.2.0] - 2026-03-23
+
+### Added
+- **Model probing**: `cm probe` and `cm scan` commands to test which models actually respond
+  - Tests models with a minimal "Hi" request (max_tokens=1) to verify they work
+  - Displays progress in real-time with status (✓/✗), response time, and context length
+  - Caches results for 24 hours to avoid repeated API calls
+  - Supports `--limit N` (default 10), `--force` (ignore cache), `--json` output
+  - Shows summary of working vs failed models and recommends top 3 fastest
+  - Cost-conscious: warns about credits, uses minimal tokens
+- **OpenRouterProvider.testModel()**: New method to programmatically test a single model
+
+### Changed
+- N/A
+
+### Deprecated
+- N/A
+
+### Removed
+- N/A
+
+### Fixed
+- N/A
+
+### Security
+- N/A
+
 ## [1.1.0] - 2026-03-23
 
 ### Added

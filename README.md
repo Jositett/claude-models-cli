@@ -20,6 +20,7 @@ Built with [Bun](https://bun.sh) for maximum performance and compatibility acros
 - 🔌 **Multi-provider** support (OpenRouter, HuggingFace, Ollama)
 - 💾 **Model caching** - reduces API calls with TTL-based local cache
 - 🎯 **Interactive selection** - `cm select` for choosing models from TUI
+- 🔍 **Model probing** - test which models actually work (`cm probe`)
 - 📊 **Activity logging** and usage tracking
 - 🛠️ **Smart defaults** for coding tasks
 - 🌍 **Cross-platform** - works on macOS, Linux, and Windows
@@ -96,6 +97,10 @@ cm --help      # Show all options
 # Cache management (new in v1.1.0)
 cm cache clear  # Clear the model cache
 cm cache stats  # Show cache statistics (entries, size)
+
+# Model probing (new in v1.2.0)
+cm probe --limit 20  # Test models to see which actually work
+cm scan --json       # Get machine-readable probe results
 ```
 
 ### Interactive Selection

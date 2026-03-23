@@ -20,14 +20,34 @@
 - [x] GitHub repository configured with GitHub Actions (CI/CD workflow)
 - [x] Repository: https://github.com/Jositett/claude-models-cli
 
+## ✅ v1.2.0 Released (2026-03-23) - Model Probing
+
+**Release:** https://github.com/Jositett/claude-models-cli/releases/tag/v1.2.0
+
+### Completed for v1.2.0
+- [x] Model probing: `cm probe` and `cm scan` commands
+- [x] ProbeManager class with caching (24h TTL)
+- [x] OpenRouterProvider.testModel() method
+- [x] Sequential probing with configurable limit
+- [x] JSON output for probe results
+- [x] Cost warning before probing
+- [x] Display response time and context length
+- [x] Recommended working models list
+- [x] Updated documentation (README, CHANGELOG, usage-guide)
+
 ---
 
 ## Current Status
-- ✅ **v1.0.0** - First stable release published
+- ✅ **v1.2.0** - Latest release with model probing
 - ⚠️ GitHub Actions: Billing lock prevents CI runners (workflow exists)
-- 🎯 Next: v1.1.0 features and improvements
+- 🎯 Next: Future enhancements (see backlog)
 
-## In Progress (v1.1.0 Planning)
+## Completed (v1.1.0)
+- [x] **Model caching** (cache.ts, cm1-cm10, cache commands)
+- [x] **Interactive selection** (`cm select`)
+- [x] Build system fix: switched to tsc
+
+---
 
 ### Priority 1: Quality of Life
 - [x] **Model caching**: Reduce OpenRouter API calls with local cache
