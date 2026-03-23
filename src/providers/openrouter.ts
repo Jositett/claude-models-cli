@@ -6,8 +6,16 @@ export class OpenRouterProvider {
   async fetchModels(limit: number = 10): Promise<Model[]> {
     try {
       const response = await fetch(this.API_URL);
+
       if (!response.ok) {
-        throw new Error(`OpenRouter API error: ${response.status}`);
+        if (response.status === 429) {
+          throw new Error('OpenRouter rate limit exceeded. Try again in 1 hour or use "cla" for auto-fallback.');
+        } else if (response.status === 401) {
+          throw new Error('Invalid OPENROUTER_API_KEY. Get a key at https://openrouter.ai/keys');
+        } else if (response.status === 403) {
+          throw new Error('OpenRouter access forbidden. Check your API key permissions.');
+        }
+        throw new Error(`OpenRouter API error: ${response.status} ${response.statusText}`);
       }
 
       const data = await response.json();
