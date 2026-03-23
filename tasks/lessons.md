@@ -68,6 +68,19 @@ gh release create v1.0.0 --target master --title "v1.0.0" --notes "Full release 
 - Set `"strict": false` if Bun-specific APIs cause false positive type errors
 - `noEmitOnError: false` ensures JS output even with type warnings
 
+### 9. Documentation Sync for Releases
+Before tagging a release:
+- ✅ Update CHANGELOG.md with new version section
+- ✅ Update README.md with new features and commands
+- ✅ Bump version in `package.json` and `src/version.ts`
+- ✅ Update `tasks/todo.md` to mark features complete
+- ✅ Verify all tests pass and build succeeds
+- ✅ Test `cm --help` and new commands with `--help`
+
+After tag push:
+- Create GitHub release with detailed notes
+- Include upgrade instructions and changelog highlights
+
 ## User Experience Lessons
 
 ### 1. CLI Naming
