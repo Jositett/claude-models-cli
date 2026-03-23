@@ -42,10 +42,18 @@
 - [x] Async loading of probe results (non-blocking)
 - [x] Legend for status indicators in select UI
 
+### Completed for v1.3.0
+- [x] Retry logic with exponential backoff
+- [x] Configurable via environment variables (OPENROUTER_RETRY_ATTEMPTS, etc.)
+- [x] Smart retry: retries on 429, 5xx, network errors; avoids 401/402/404
+- [x] Applied to OpenRouterProvider (fetchModels, testModel)
+- [x] Applied to OllamaProvider (fetchModels)
+- [x] Added unit tests for retry logic (13 tests passing)
+
 ---
 
 ## Current Status
-- ✅ **v1.2.1** - Latest release with probe integration
+- ✅ **v1.3.0** - Latest release with retry logic
 - ⚠️ GitHub Actions: Billing lock prevents CI runners (workflow exists)
 - 🎯 Next: Future enhancements (see backlog)
 
@@ -59,7 +67,7 @@
 ### Priority 1: Quality of Life
 - [x] **Model caching**: Reduce OpenRouter API calls with local cache
 - [ ] **Config validation**: JSON schema for config.json
-- [ ] **Retry logic**: Exponential backoff for transient failures
+- [x] **Retry logic**: Exponential backoff for transient failures
 - [ ] **Better help**: Add examples to `cm --help`
 - [ ] **Installation verification**: Check Bun dependency before install
 

@@ -25,7 +25,39 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Security
 - N/A
 
-## [1.2.0] - 2026-03-23
+## [1.3.0] - 2026-03-23
+
+### Added
+- **Retry logic with exponential backoff**: Automatic retries for transient failures
+  - New `src/utils/retry.ts` with `retryWithBackoff` utility
+  - Integrated into `OpenRouterProvider` (both `fetchModels` and `testModel`)
+  - Integrated into `OllamaProvider` (`fetchModels`)
+  - Smart retry decisions: retries on 429 (rate limit), 5xx server errors, network errors
+  - Avoids retry on permanent errors: 401 (unauthorized), 402 (insufficient credits), 404 (not found)
+  - Configurable via environment variables:
+    - `OPENROUTER_RETRY_ATTEMPTS` (default 3)
+    - `OPENROUTER_RETRY_DELAY_MS` (default 1000)
+    - `OLLAMA_RETRY_ATTEMPTS` (default 2)
+    - `OLLAMA_RETRY_DELAY_MS` (default 500)
+  - Exponential backoff with jitter to avoid thundering herd
+  - Unit tests for retry logic (13 tests passing)
+
+### Changed
+- N/A
+
+### Deprecated
+- N/A
+
+### Removed
+- N/A
+
+### Fixed
+- N/A
+
+### Security
+- N/A
+
+## [1.2.1] - 2026-03-23
 
 ### Added
 - **Model probing**: `cm probe` and `cm scan` commands to test which models actually respond

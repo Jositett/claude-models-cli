@@ -1,6 +1,6 @@
 {
   "name": "claude-models-cli",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "description": "Cross-platform CLI for managing free AI models with Claude Code",
   "type": "module",
   "main": "dist/index.js",
