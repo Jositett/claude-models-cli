@@ -1,0 +1,138 @@
+import { Config, DEFAULT_CONFIG, getConfigDir } from './types';
+
+export class ConfigManager {
+  private configDir: string;
+  private configFile: string;
+  private modelsFile: string;
+  private providersFile: string;
+  private aliasesFile: string;
+  private logFile: string;
+
+  constructor() {
+    this.configDir = getConfigDir();
+    this.configFile = `${this.configDir}/config.json`;
+    this.modelsFile = `${this.configDir}/models.json`;
+    this.providersFile = `${this.configDir}/providers.json`;
+    this.aliasesFile = `${this.configDir}/aliases.sh`;
+    this.logFile = `${this.configDir}/activity.log`;
+  }
+
+  getConfigDir(): string {
+    return this.configDir;
+  }
+
+  getModelsFile(): string {
+    return this.modelsFile;
+  }
+
+  getAliasesFile(): string {
+    return this.aliasesFile;
+  }
+
+  getLogFile(): string {
+    return this.logFile;
+  }
+
+  async initialize(): Promise<Config> {
+    // Ensure config directory exists
+    try {
+      await Bun.write(this.configDir, '');
+    } catch (error) {
+      // Directory might already exist
+      if (!(await this.dirExists(this.configDir))) {
+        throw error;
+      }
+    }
+
+    // Create default config if not exists
+    if (!(await this.fileExists(this.configFile))) {
+      await this.saveConfig(DEFAULT_CONFIG);
+      return DEFAULT_CONFIG;
+    }
+
+    const config = await this.loadConfig();
+    return config;
+  }
+
+  async loadConfig(): Promise<Config> {
+    try {
+      const content = await Bun.file(this.configFile).text();
+      return JSON.parse(content) as Config;
+    } catch (error) {
+      console.error('Failed to load config:', error);
+      return DEFAULT_CONFIG;
+    }
+  }
+
+  async saveConfig(config: Config): Promise<void> {
+    await Bun.file(this.configFile).write(JSON.stringify(config, null, 2));
+  }
+
+  async loadModels(): Promise<any[] | null> {
+    try {
+      if (!(await this.fileExists(this.modelsFile))) {
+        return null;
+      }
+      const content = await Bun.file(this.modelsFile).text();
+      return JSON.parse(content);
+    } catch (error) {
+      console.error('Failed to load models:', error);
+      return null;
+    }
+  }
+
+  async saveModels(models: any[]): Promise<void> {
+    await Bun.file(this.modelsFile).write(JSON.stringify(models, null, 2));
+  }
+
+  async shouldUpdate(updateIntervalHours: number): Promise<boolean> {
+    if (!(await this.fileExists(this.modelsFile))) {
+      return true;
+    }
+
+    try {
+      const stats = await Bun.stat(this.modelsFile);
+      const hoursSince = (Date.now() - stats.mtime) / (1000 * 60 * 60);
+      return hoursSince >= updateIntervalHours;
+    } catch {
+      return true;
+    }
+  }
+
+  async log(message: string): Promise<void> {
+    if (!(await this.fileExists(this.logFile))) {
+      try {
+        await Bun.write(this.logFile, '');
+      } catch {
+        // Directory might not exist, but that's okay
+      }
+    }
+
+    const timestamp = new Date().toISOString().replace('T', ' ').substring(0, 19);
+    const logMessage = `[${timestamp}] ${message}\n`;
+
+    try {
+      await Bun.write(this.logFile, logMessage, { append: true });
+    } catch (error) {
+      console.error('Failed to write log:', error);
+    }
+  }
+
+  private async fileExists(path: string): Promise<boolean> {
+    try {
+      await Bun.stat(path);
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  private async dirExists(path: string): Promise<boolean> {
+    try {
+      const stats = await Bun.stat(path);
+      return stats.type === 'directory';
+    } catch {
+      return false;
+    }
+  }
+}

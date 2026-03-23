@@ -1,0 +1,56 @@
+{
+  "name": "claude-models-cli",
+  "version": "1.0.0",
+  "description": "Cross-platform CLI for managing free AI models with Claude Code",
+  "type": "module",
+  "main": "dist/index.js",
+  "bin": {
+    "cm": "./dist/cli.js",
+    "claude-models": "./dist/cli.js"
+  },
+  "scripts": {
+    "prepublishOnly": "bun run build",
+    "build": "bun build ./src/cli.ts --outdir ./dist && bun build ./src/index.ts --outdir ./dist",
+    "build:cli": "bun build ./src/cli.ts --outdir ./dist",
+    "build:lib": "bun build ./src/index.ts --outdir ./dist",
+    "dev": "bun --watch ./src/cli.ts",
+    "start": "bun ./dist/cli.js",
+    "test": "bun test",
+    "test:coverage": "bun test --coverage",
+    "types": "tsc --noEmit",
+    "lint": "tsc --noEmit"
+  },
+  "keywords": [
+    "claude",
+    "ai",
+    "cli",
+    "openrouter",
+    "free-models",
+    "bun",
+    "cross-platform"
+  ],
+  "author": "Joedroid",
+  "license": "MIT",
+  "engines": {
+    "bun": ">=1.0.0"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE",
+    "install.sh",
+    "install.ps1"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/YOURUSERNAME/claude-models-cli.git"
+  },
+  "bugs": {
+    "url": "https://github.com/YOURUSERNAME/claude-models-cli/issues"
+  },
+  "homepage": "https://github.com/YOURUSERNAME/claude-models-cli#readme",
+  "dependencies": {},
+  "devDependencies": {
+    "typescript": "^5.0.0"
+  }
+}

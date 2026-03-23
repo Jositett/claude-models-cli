@@ -29,6 +29,16 @@ dist/
 build/
 *.zip
 
+# Bun
+bun.lockb
+.bun/
+
+# Node (if any)
+node_modules/
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
 # Environment
 .env
 .claude/agents/
