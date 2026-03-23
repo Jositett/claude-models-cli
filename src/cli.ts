@@ -134,7 +134,7 @@ async function main() {
 
     case 'select':
       // Interactive model selection
-      await handleSelect(cm);
+      await handleSelect(cm, args);
       break;
 
     case 'help':
@@ -189,6 +189,7 @@ Commands:
   update, -u          Fetch and rank latest free models
   list, -l            Show current top 10 models
   select              Interactive model selection
+                      Options: --only-working (show only probed models)
   providers, -p       List configured providers
   config, -c          Edit configuration file
   logs, -L            View recent activity logs
@@ -246,7 +247,7 @@ async function handleProbe(cm: ClaudeModels, args: string[]) {
     const limitArg = args.find(arg => arg.startsWith('--limit='));
     const limit = limitArg ? parseInt(limitArg.split('=')[1], 10) : 10;
     const concurrencyArg = args.find(arg => arg.startsWith('--concurrency='));
-    const concurrency = concurrencyArg ? parseInt(concurrencyArg.split('=')[1], 10) : 1;
+    const concurrency = concurrencyArg ? parseInt(concurrencyArg.split('=')[1], 10) : 3; // Default to 3 concurrent probes
 
     const actualCount = Math.min(models.length, limit);
 
@@ -287,7 +288,7 @@ async function handleProbe(cm: ClaudeModels, args: string[]) {
   }
 }
 
-async function handleSelect(cm: ClaudeModels) {
+async function handleSelect(cm: ClaudeModels, args: string[]) {
   try {
     const models = await cm.getModels();
 
@@ -296,18 +297,67 @@ async function handleSelect(cm: ClaudeModels) {
       return;
     }
 
+    // Parse options
+    const onlyWorking = args.includes('--only-working') || args.includes('-w');
+
+    // Load probe results in background (non-blocking)
+    let probeResults: Map<string, any> = new Map();
+    if (onlyWorking) {
+      try {
+        const config = cm['configManager'];
+        const cacheManager = config.getCacheManager();
+        const ProbeManagerClass = (await import('./probing.js')).ProbeManager;
+        const probeManager = new ProbeManagerClass(config.getConfigDir(), cacheManager);
+        probeResults = await probeManager.loadResults();
+      } catch (error) {
+        console.debug('Could not load probe results:', error);
+      }
+    }
+
+    // Filter models if --only-working flag is set
+    let displayModels = models;
+    if (onlyWorking) {
+      displayModels = models.filter(m => {
+        const probe = probeResults.get(m.id);
+        return probe && probe.status === 'ok';
+      });
+      if (displayModels.length === 0) {
+        console.log('\n⚠️  No models have successful probe results.');
+        console.log('Run "cm probe" to test models first, or remove --only-working flag.\n');
+        return;
+      }
+    }
+
     console.log('\n🔝 Select a Model:\n');
     console.log('================================\n');
 
-    // Display models
-    for (const model of models) {
+    // Display models with probe status
+    for (const model of displayModels) {
       const rank = `[${model.rank}]`.padEnd(4);
       const id = model.id.padEnd(40);
       const context = model.contextLength ? `${Math.round(model.contextLength / 1000)}K`.padEnd(5) : 'N/A'.padEnd(5);
-      console.log(`${rank} ${cyan(id)} ${gray(context)} - ${white(model.description || 'Free tier model')}`);
+
+      // Show probe status indicator if available
+      const probeResult = probeResults.get(model.id);
+      let statusIndicator = '';
+      if (probeResult) {
+        if (probeResult.status === 'ok') {
+          statusIndicator = '\x1b[32m✓\x1b[0m '; // green ✓
+        } else {
+          statusIndicator = '\x1b[31m✗\x1b[0m '; // red ✗
+        }
+      } else {
+        statusIndicator = '\x1b[90m?\x1b[0m '; // gray ?
+      }
+
+      console.log(`${rank} ${statusIndicator}${cyan(id)} ${gray(context)} - ${white(model.description || 'Free tier model')}`);
     }
 
     console.log('\n  0) Cancel');
+    console.log('\n  Legend: \x1b[32m✓ working\x1b[0m  \x1b[31m✗ failing\x1b[0m  \x1b[90m? not tested\x1b[0m');
+    if (onlyWorking) {
+      console.log('  (showing only working models)');
+    }
 
     // Prompt for selection
     console.log('\nEnter model number (1-' + models.length + '):');
