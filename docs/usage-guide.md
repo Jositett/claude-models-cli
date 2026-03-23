@@ -88,6 +88,13 @@ cm list
 # Force refresh the model list (ignores cache)
 cm update --force
 
+# Interactive model selection (NEW in v1.1.0)
+cm select
+
+# Cache management (NEW in v1.1.0)
+cm cache stats    # Show cache statistics
+cm cache clear    # Clear the model cache
+
 # View recent activity
 cm logs
 
