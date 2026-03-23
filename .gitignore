@@ -42,3 +42,6 @@ pnpm-lock.yaml
 # Environment
 .env
 .claude/agents/
+
+# Claude Code local settings
+.claude/settings.local.json
