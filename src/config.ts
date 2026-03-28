@@ -99,6 +99,11 @@ export class ConfigManager {
   }
 
   async saveModels(models: any[]): Promise<void> {
+    // Prevent saving empty models array (data loss protection)
+    if (models.length === 0) {
+      console.warn('⚠️  Attempted to save empty models array - skipped for data safety');
+      return;
+    }
     await writeFile(this.modelsFile, JSON.stringify(models, null, 2), 'utf-8');
   }
 

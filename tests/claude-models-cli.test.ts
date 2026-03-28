@@ -138,6 +138,58 @@ describe('ClaudeModelsCLI', () => {
       const models = await cm.updateModels(true, ['openrouter']);
       expect(models.length).toBeLessThanOrEqual(5);
     });
+
+    it('should preserve existing models when provider returns empty', async () => {
+      const cm = new ClaudeModels();
+      await cm.initialize();
+
+      // Setup: Manually save some existing models
+      const existingModels = [
+        {
+          id: 'test/model1:free',
+          name: 'Test Model 1',
+          provider: 'test',
+          contextLength: 4096,
+          description: 'A test model',
+          score: 100,
+          source: 'Test',
+          rank: 1,
+          lastUpdated: new Date().toISOString().replace('T', ' ').substring(0, 19),
+        },
+        {
+          id: 'test/model2:free',
+          name: 'Test Model 2',
+          provider: 'test',
+          contextLength: 8192,
+          description: 'Another test model',
+          score: 90,
+          source: 'Test',
+          rank: 2,
+          lastUpdated: new Date().toISOString().replace('T', ' ').substring(0, 19),
+        },
+      ];
+      const configManager = (cm as any).configManager;
+      await configManager.saveModels(existingModels);
+
+      // Mock the openrouter provider to return empty array (simulating network failure)
+      const fakeProvider = {
+        fetchModels: async () => [],
+      };
+      (cm as any).providers.set('openrouter', fakeProvider);
+
+      // Attempt update - should NOT wipe existing models
+      const result = await cm.updateModels(false, ['openrouter']);
+
+      // Verify that existing models are returned (preserved)
+      expect(Array.isArray(result)).toBe(true);
+      expect(result.length).toBe(2);
+      expect(result[0].id).toBe('test/model1:free');
+
+      // Verify models file still contains the original models (not empty array)
+      const savedModels = await configManager.loadModels();
+      expect(savedModels.length).toBe(2);
+      expect(savedModels[0].id).toBe('test/model1:free');
+    });
   });
 });
 

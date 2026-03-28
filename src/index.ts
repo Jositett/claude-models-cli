@@ -73,6 +73,24 @@ export class ClaudeModels {
       .sort((a, b) => b.score - a.score)
       .slice(0, config.maxModels);
 
+    // If no models were fetched from providers, preserve existing models instead of overwriting with empty array
+    if (ranked.length === 0) {
+      console.error('❌ Failed to fetch models from any provider.');
+      console.log('ℹ️ Preserving existing models (if any exist).');
+      // Try to load and return existing models from cache/file
+      try {
+        const existingModels = await this.configManager.loadModels();
+        if (existingModels && existingModels.length > 0) {
+          console.log(`✓ Loaded ${existingModels.length} models from cache.`);
+          return existingModels;
+        }
+      } catch {
+        // No existing models to fall back to
+      }
+      // No models available at all
+      throw new Error('No models available and could not fetch from providers. Check network and API key.');
+    }
+
     // Add ranks
     const rankedWithRanks = ranked.map((model, index) => ({
       ...model,
