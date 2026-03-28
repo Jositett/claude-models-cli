@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Claude Models CLI - Unix/Linux/macOS Installation Script
-# Usage: curl -fsSL https://raw.githubusercontent.com/Jositett/claude-models-cli/main/install.sh | bash
+# Usage: curl -fsSL https://raw.githubusercontent.com/Jositett/claude-models-cli/master/install.sh | bash
 
 set -e
 

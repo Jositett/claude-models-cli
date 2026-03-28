@@ -10,7 +10,7 @@ Built with [Bun](https://bun.sh) for maximum performance and compatibility acros
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![GitHub release](https://img.shields.io/github/v/release/Jositett/claude-models-cli.svg)](https://github.com/Jositett/claude-models-cli/releases)
 [![GitHub issues](https://img.shields.io/github/issues/Jositett/claude-models-cli.svg)](https://github.com/Jositett/claude-models-cli/issues)
-[![GitHub last commit](https://img.shields.io/github/last-commit/Jositett/claude-models-cli.svg)](https://github.com/Jositett/claude-models-cli/commits/main)
+[![GitHub last commit](https://img.shields.io/github/last-commit/Jositett/claude-models-cli.svg)](https://github.com/Jositett/claude-models-cli/commits/master)
 
 ## Features
 
@@ -46,12 +46,12 @@ bun run build
 
 **Unix/Linux/macOS:**
 ```bash
-curl -fsSL https://raw.githubusercontent.com/Jositett/claude-models-cli/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/Jositett/claude-models-cli/master/install.sh | bash
 ```
 
 **Windows PowerShell:**
 ```powershell
-irm https://raw.githubusercontent.com/Jositett/claude-models-cli/main/install.ps1 | iex
+irm https://raw.githubusercontent.com/Jositett/claude-models-cli/master/install.ps1 | iex
 ```
 
 ## Usage
