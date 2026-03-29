@@ -58,6 +58,24 @@
 - [x] Clear error messages with suggestions
 - [x] 12 unit tests for validation logic
 
+## 🚧 v1.5.0 - Self-Update Command (In Progress)
+
+**Spec:** `docs/superpowers/specs/2026-03-28-self-update-command-design.md`
+
+- [x] Modify `install.sh` to persist `installDir` to `config.json`
+- [x] Validate `installDir?` field in schema (already present in v1.4.0)
+- [ ] Implement `handleSelfUpdate()` in `src/cli.ts`
+- [ ] Write unit tests (`tests/self-update.test.ts`)
+- [ ] Update documentation (README, usage-guide, CHANGELOG)
+- [ ] Release v1.5.0
+
+**Implementation Notes:**
+- Added jq-based installDir persistence to `install.sh` after config directory creation (line 83-95)
+- Includes jq availability check; warns if jq missing
+- Idempotent: only adds field if not present
+- Schema already supports `installDir?` (validated in v1.4.0)
+- See commit: `install: persist installDir to config for self-update`
+
 ---
 
 ## Current Status

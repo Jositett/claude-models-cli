@@ -80,6 +80,20 @@ fi
 # Setup config directory
 mkdir -p "$CONFIG_DIR"
 
+# Save install directory to config for future self-update
+CONFIG_FILE="$CONFIG_DIR/config.json"
+if command -v jq &> /dev/null; then
+  if [ -f "$CONFIG_FILE" ]; then
+    # Use jq to add installDir field if not present (idempotent)
+    if ! jq -e '.installDir' "$CONFIG_FILE" > /dev/null 2>&1; then
+      tmp=$(mktemp)
+      jq --arg dir "$INSTALL_DIR" '.installDir = $dir' "$CONFIG_FILE" > "$tmp" && mv "$tmp" "$CONFIG_FILE"
+    fi
+  fi
+else
+  echo "⚠️  jq not found - installDir not saved. Self-update may not work correctly."
+fi
+
 echo ""
 echo "✅ Installation complete!"
 echo ""
