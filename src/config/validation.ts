@@ -97,6 +97,15 @@ export function validateConfig(config: any): { valid: boolean; errors: Validatio
     }
   }
 
+  // Validate installDir (optional, must be string if present)
+  if (config.installDir !== undefined && typeof config.installDir !== 'string') {
+    errors.push({
+      field: 'installDir',
+      message: 'must be a string',
+      suggestion: 'Path to the installation directory for self-update functionality',
+    });
+  }
+
   // Validate rateLimitHandling
   if (config.rateLimitHandling !== undefined) {
     const allowed = ['rotate', 'fail', 'retry'];

@@ -19,6 +19,7 @@ export interface Config {
   preferredContext: string;
   rateLimitHandling: 'rotate' | 'fail' | 'retry';
   logActivity: boolean;
+  installDir?: string;
 }
 
 export interface Provider {
