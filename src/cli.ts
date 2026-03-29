@@ -2,8 +2,22 @@
 
 import { ClaudeModels } from './index.js';
 import { PKG_VERSION, PKG_NAME, REPO_URL } from './version.js';
-import { statSync, readFileSync } from 'fs';
+import { statSync, readFileSync, existsSync } from 'fs';
+import { resolve } from 'path';
+import { exec } from 'child_process';
 import { ProbeManager } from './probing.js';
+
+interface UpdateResult {
+  success: boolean;
+  dryRun?: boolean;
+  action: 'updated' | 'already-latest' | 'not-git' | 'no-git-cmd' | 'error';
+  oldVersion?: string;
+  oldCommit?: string;
+  newVersion?: string;
+  newCommit?: string;
+  error?: string;
+  installDir?: string;
+}
 
 async function main() {
   const args = process.argv.slice(2);
@@ -430,6 +444,68 @@ async function handleSelect(cm: ClaudeModels, args: string[]) {
     }
   } catch (error: any) {
     console.error('❌ Selection failed:', error.message);
+  }
+}
+
+// Self-update helper functions
+function getInstallDir(configManager: any): string {
+  try {
+    const config = configManager.loadConfigSync?.() || (configManager as any).loadConfig();
+    if (config?.installDir) {
+      return config.installDir;
+    }
+  } catch {
+    // Fall through
+  }
+
+  const envDir = process.env.CLAUDE_MODELS_INSTALL_DIR;
+  if (envDir) {
+    return envDir;
+  }
+
+  const home = process.env.HOME || process.env.USERPROFILE || require('os').homedir();
+  return resolve(home, '.claude-models-cli-repo');
+}
+
+function detectInstallType(installDir: string): 'git' | 'standalone' | 'unknown' {
+  if (!existsSync(installDir)) {
+    return 'unknown';
+  }
+  if (existsSync(resolve(installDir, '.git'))) {
+    return 'git';
+  }
+  if (existsSync(resolve(installDir, 'dist', 'cli.js'))) {
+    return 'standalone';
+  }
+  return 'unknown';
+}
+
+async function checkGitAvailable(): Promise<boolean> {
+  try {
+    await new Promise((resolve, reject) => {
+      exec('git --version', (err) => err ? reject(err) : resolve(null));
+    });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+async function getGitInfo(installDir: string): Promise<{ version: string; commit: string } | null> {
+  try {
+    const pkgPath = resolve(installDir, 'package.json');
+    const pkgContent = await Bun.file(pkgPath).text();
+    const pkg = JSON.parse(pkgContent);
+
+    const commit = await new Promise<string>((resolve, reject) => {
+      exec('git rev-parse --short HEAD', { cwd: installDir }, (err, stdout) => {
+        err ? reject(err) : resolve(stdout.trim());
+      });
+    });
+
+    return { version: pkg.version, commit };
+  } catch {
+    return null;
   }
 }
 
