@@ -73,6 +73,16 @@ if ($currentPath -notlike "*$env:USERPROFILE\bin*") {
 # Setup config directory
 New-Item -ItemType Directory -Path $ConfigDir -Force | Out-Null
 
+# Save install directory to config for future self-update
+$ConfigFile = "$ConfigDir\config.json"
+if (Test-Path $ConfigFile) {
+  $config = Get-Content $ConfigFile -Raw | ConvertFrom-Json
+  if (-not $config.installDir) {
+    $config | Add-Member -NotePropertyName 'installDir' -NotePropertyValue $destDir
+    $config | ConvertTo-Json -Depth 10 | Out-File $ConfigFile -Encoding UTF8
+  }
+}
+
 Write-Host "`n✅ Installation complete!" -ForegroundColor Green
 Write-Host "`nNext steps:" -ForegroundColor Cyan
 Write-Host "1. Restart your terminal or run: `$env:Path += ';$env:USERPROFILE\bin'" -ForegroundColor White
