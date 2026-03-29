@@ -509,6 +509,203 @@ async function getGitInfo(installDir: string): Promise<{ version: string; commit
   }
 }
 
+async function runGitUpdate(
+  installDir: string,
+  dryRun: boolean = false
+): Promise<UpdateResult> {
+  // Check git availability
+  if (!await checkGitAvailable()) {
+    return {
+      success: false,
+      action: 'no-git-cmd',
+      error: 'Git is not installed or not in your PATH. Please install Git from https://git-scm.com/ and try again.',
+      installDir,
+    };
+  }
+
+  // Get current version & commit
+  const oldInfo = await getGitInfo(installDir);
+  if (!oldInfo) {
+    return {
+      success: false,
+      action: 'error',
+      error: `Could not read git info from install directory: ${installDir}`,
+      installDir,
+    };
+  }
+
+  // Dry-run mode: check remote without pulling
+  if (dryRun) {
+    try {
+      await new Promise((resolve, reject) => {
+        exec('git fetch origin', { cwd: installDir }, (err) => err ? reject(err) : resolve(null));
+      });
+
+      const currentCommit = await new Promise<string>((resolve, reject) => {
+        exec('git rev-parse HEAD', { cwd: installDir }, (err, stdout) => {
+          err ? reject(err) : resolve(stdout.trim());
+        });
+      });
+
+      const remoteCommit = await new Promise<string>((resolve, reject) => {
+        exec('git rev-parse origin/master', { cwd: installDir }, (err, stdout) => {
+          err ? reject(err) : resolve(stdout.trim());
+        });
+      });
+
+      if (currentCommit === remoteCommit) {
+        return {
+          success: true,
+          dryRun: true,
+          action: 'already-latest',
+          oldVersion: oldInfo.version,
+          oldCommit: currentCommit,
+          installDir,
+        };
+      }
+
+      // Get remote version
+      const remotePkgJson = await new Promise<string>((resolve, reject) => {
+        exec('git show origin/master:package.json', { cwd: installDir }, (err, stdout) => {
+          err ? reject(err) : resolve(stdout);
+        });
+      });
+      const remotePkg = JSON.parse(remotePkgJson);
+
+      return {
+        success: true,
+        dryRun: true,
+        action: 'updated',
+        oldVersion: oldInfo.version,
+        oldCommit: currentCommit,
+        newVersion: remotePkg.version,
+        newCommit: remoteCommit,
+        installDir,
+      };
+    } catch (error: any) {
+      return {
+        success: false,
+        dryRun: true,
+        action: 'error',
+        error: `Failed to check for updates: ${error.message}`,
+        installDir,
+      };
+    }
+  }
+
+  // Live update: check for uncommitted changes
+  try {
+    const status = await new Promise<string>((resolve, reject) => {
+      exec('git status --porcelain', { cwd: installDir }, (err, stdout) => {
+        err ? reject(err) : resolve(stdout.trim());
+      });
+    });
+    if (status) {
+      return {
+        success: false,
+        action: 'error',
+        error: `You have uncommitted changes in the install directory. Please commit or stash them before updating.\n\nUncommitted changes:\n${status}`,
+        installDir,
+      };
+    }
+  } catch (error: any) {
+    return {
+      success: false,
+      action: 'error',
+      error: `Failed to check git status: ${error.message}`,
+      installDir,
+    };
+  }
+
+  // Perform git pull
+  try {
+    await new Promise((resolve, reject) => {
+      exec('git pull origin master', { cwd: installDir }, (err, stdout, stderr) => {
+        if (err) {
+          // Parse specific git errors
+          const combined = stdout + stderr;
+          let parsedError = `Git pull failed: ${err.message}`;
+
+          if (combined.includes('CONFLICT') || combined.includes('merge conflict')) {
+            parsedError = 'Merge conflict detected. Please resolve conflicts manually or reinstall fresh.';
+          } else if (combined.includes('Authentication failed')) {
+            parsedError = 'Git authentication failed. Check your credentials or SSH keys.';
+          } else if (combined.includes('Could not resolve host') || combined.includes('Failed to connect')) {
+            parsedError = 'Network error: Could not connect to GitHub. Check your internet connection.';
+          }
+
+          const wrappedError = new Error(parsedError) as any;
+          wrappedError.original = err;
+          wrappedError.gitOutput = combined;
+          reject(wrappedError);
+        } else {
+          resolve(null);
+        }
+      });
+    });
+  } catch (error: any) {
+    return {
+      success: false,
+      action: 'error',
+      error: error.message,
+      installDir,
+      oldVersion: oldInfo.version,
+      oldCommit: oldInfo.commit,
+    };
+  }
+
+  // Check if version changed
+  const newInfo = await getGitInfo(installDir);
+  if (!newInfo) {
+    return {
+      success: false,
+      action: 'error',
+      error: `Update succeeded but could not read new version.`,
+      installDir,
+      oldVersion: oldInfo.version,
+    };
+  }
+
+  if (newInfo.version === oldInfo.version && newInfo.commit === oldInfo.commit) {
+    return {
+      success: true,
+      action: 'already-latest',
+      oldVersion: oldInfo.version,
+      oldCommit: oldInfo.commit,
+      installDir,
+    };
+  }
+
+  // Rebuild
+  try {
+    await new Promise((resolve, reject) => {
+      exec('bun install', { cwd: installDir }, (err) => err ? reject(err) : resolve(null));
+    });
+    await new Promise((resolve, reject) => {
+      exec('bun run build', { cwd: installDir }, (err) => err ? reject(err) : resolve(null));
+    });
+  } catch (error: any) {
+    return {
+      success: false,
+      action: 'error',
+      error: `Build failed after update: ${error.message}\n\nThe update was downloaded but could not be built. The old version remains functional. Try running 'bun run build' manually in ${installDir}`,
+      installDir,
+      oldVersion: oldInfo.version,
+      newVersion: newInfo.version,
+    };
+  }
+
+  return {
+    success: true,
+    action: 'updated',
+    oldVersion: oldInfo.version,
+    oldCommit: oldInfo.commit,
+    newVersion: newInfo.version,
+    newCommit: newInfo.commit,
+    installDir,
+  };
+}
+
 // ANSI color codes for terminal output
 function cyan(text: string): string {
   return `\x1b[36m${text}\x1b[0m`;
