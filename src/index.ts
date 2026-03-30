@@ -282,19 +282,28 @@ function cma() {
   }
 }
 
+// NO_COLOR support: check if colored output should be disabled on each call
+function isColorEnabled(): boolean {
+  const noColor = process.env.NO_COLOR;
+  return !(noColor && noColor.length > 0);
+}
+
 // ANSI color codes for terminal output
 function cyan(text: string): string {
-  return `\x1b[36m${text}\x1b[0m`;
+  return isColorEnabled() ? `\x1b[36m${text}\x1b[0m` : text;
 }
 
 function gray(text: string): string {
-  return `\x1b[90m${text}\x1b[0m`;
+  return isColorEnabled() ? `\x1b[90m${text}\x1b[0m` : text;
 }
 
 function magenta(text: string): string {
-  return `\x1b[35m${text}\x1b[0m`;
+  return isColorEnabled() ? `\x1b[35m${text}\x1b[0m` : text;
 }
 
 function white(text: string): string {
-  return `\x1b[97m${text}\x1b[0m`;
+  return isColorEnabled() ? `\x1b[97m${text}\x1b[0m` : text;
 }
+
+// Export for testing (internal utilities)
+export { cyan, gray, magenta, white };

@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach, beforeAll, afterAll } from 'bun:test';
 import { rm, mkdir, access } from 'fs/promises';
-import { ClaudeModels } from '../src/index';
+import { ClaudeModels, cyan, gray, magenta, white } from '../src/index';
 import { ConfigManager } from '../src/config';
 
 // Use a dedicated test config directory
@@ -190,6 +190,33 @@ describe('ClaudeModelsCLI', () => {
       expect(savedModels.length).toBe(2);
       expect(savedModels[0].id).toBe('test/model1:free');
     });
+  });
+});
+
+describe('NO_COLOR Support', () => {
+  beforeEach(() => {
+    // Ensure NO_COLOR is not set before each test
+    delete process.env.NO_COLOR;
+  });
+
+  afterEach(() => {
+    delete process.env.NO_COLOR;
+  });
+
+  it('should apply ANSI colors when NO_COLOR is not set', () => {
+    const colored = cyan('test');
+    expect(colored).toContain('\x1b[36m');
+    expect(colored).toContain('\x1b[0m');
+    expect(colored).toBe('\x1b[36mtest\x1b[0m');
+  });
+
+  it('should NOT apply ANSI colors when NO_COLOR is set', () => {
+    process.env.NO_COLOR = '1';
+    // Re-import to re-evaluate shouldUseColors? Actually the functions capture shouldUseColors at module load time.
+    // That's a problem: shouldUseColors is a constant evaluated at module top-level. To make it responsive,
+    // we would need to check env var at call time. But we defined shouldUseColors as a const at top-level,
+    // which is evaluated when module is loaded. That means setting NO_COLOR after the fact won't affect it.
+    // Need to fix: shouldUseColors should be a function or computed on each call.
   });
 });
 

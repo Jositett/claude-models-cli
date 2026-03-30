@@ -426,19 +426,24 @@ async function handleSelect(cm: ClaudeModels, args: string[]) {
       let statusIndicator = '';
       if (probeResult) {
         if (probeResult.status === 'ok') {
-          statusIndicator = '\x1b[32m✓\x1b[0m '; // green ✓
+          statusIndicator = isColorEnabled() ? '\x1b[32m✓\x1b[0m ' : '✓ ';
         } else {
-          statusIndicator = '\x1b[31m✗\x1b[0m '; // red ✗
+          statusIndicator = isColorEnabled() ? '\x1b[31m✗\x1b[0m ' : '✗ ';
         }
       } else {
-        statusIndicator = '\x1b[90m?\x1b[0m '; // gray ?
+        statusIndicator = isColorEnabled() ? '\x1b[90m?\x1b[0m ' : '? ';
       }
 
       console.log(`${rank} ${statusIndicator}${cyan(id)} ${gray(context)} - ${white(model.description || 'Free tier model')}`);
     }
 
     console.log('\n  0) Cancel');
-    console.log('\n  Legend: \x1b[32m✓ working\x1b[0m  \x1b[31m✗ failing\x1b[0m  \x1b[90m? not tested\x1b[0m');
+    const colorsEnabled = isColorEnabled();
+    const green = colorsEnabled ? '\x1b[32m' : '';
+    const red = colorsEnabled ? '\x1b[31m' : '';
+    const gray90 = colorsEnabled ? '\x1b[90m' : '';
+    const reset = colorsEnabled ? '\x1b[0m' : '';
+    console.log(`\n  Legend: ${green}✓ working${reset}  ${red}✗ failing${reset}  ${gray90}? not tested${reset}`);
     if (onlyWorking) {
       console.log('  (showing only working models)');
     }
@@ -808,21 +813,27 @@ async function runGitUpdate(
   };
 }
 
+// NO_COLOR support: check if colored output should be disabled on each call
+function isColorEnabled(): boolean {
+  const noColor = process.env.NO_COLOR;
+  return !(noColor && noColor.length > 0);
+}
+
 // ANSI color codes for terminal output
 function cyan(text: string): string {
-  return `\x1b[36m${text}\x1b[0m`;
+  return isColorEnabled() ? `\x1b[36m${text}\x1b[0m` : text;
 }
 
 function gray(text: string): string {
-  return `\x1b[90m${text}\x1b[0m`;
+  return isColorEnabled() ? `\x1b[90m${text}\x1b[0m` : text;
 }
 
 function magenta(text: string): string {
-  return `\x1b[35m${text}\x1b[0m`;
+  return isColorEnabled() ? `\x1b[35m${text}\x1b[0m` : text;
 }
 
 function white(text: string): string {
-  return `\x1b[97m${text}\x1b[0m`;
+  return isColorEnabled() ? `\x1b[97m${text}\x1b[0m` : text;
 }
 
 main().catch(console.error);
