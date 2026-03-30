@@ -165,7 +165,14 @@ After tag push:
 - For file paths, Node handles `/` on Windows, so prefer forward slashes in generated scripts to avoid escaping issues.
 - In PowerShell generation, use Windows paths with `\` but also consider quoting; using mixed slashes still works.
 
-### 5. Release Process & Versioning
+### 5. CLI Help & UX
+- **Examples section**: Add practical examples to `--help` output. Show common workflows that combine multiple commands, not just individual flags.
+- **Quick Start**: Keep at the top for fast onboarding; show minimal steps to get started.
+- **Platform-aware examples**: Dynamically adjust examples based on OS (e.g., `cm config edit` vs manual editor command).
+- Real examples beat abstract descriptions. Use comments (`# comment`) to explain each step.
+- Show both basic and advanced patterns: `cm list --json | jq ...` illustrates scripting potential.
+
+### 6. Release Process & Versioning
 - **Version bump before tagging**: The commit that receives the version tag must have the updated version number in `package.json` and `src/version.ts`. Either include the version bump in the same commit as the release changes, or create a separate version bump commit and tag that commit.
 - **Manual releases without CI**: When GitHub Actions billing is disabled:
   - Build the project locally (`bun run build`)
