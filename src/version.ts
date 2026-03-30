@@ -1,6 +1,6 @@
 // Version info for the CLI
 // Keep this in sync with package.json
-export const VERSION = '1.4.0';
+export const VERSION = '1.5.0';
 export const NAME = 'claude-models-cli';
 export const REPO_URL = 'https://github.com/Jositett/claude-models-cli';
 
