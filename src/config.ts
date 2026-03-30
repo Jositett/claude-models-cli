@@ -17,7 +17,7 @@ export class ConfigManager {
     this.configFile = `${this.configDir}/config.json`;
     this.modelsFile = `${this.configDir}/models.json`;
     this.providersFile = `${this.configDir}/providers.json`;
-    this.aliasesFile = `${this.configDir}/aliases.sh`;
+    this.aliasesFile = `${this.configDir}/aliases.${process.platform === 'win32' ? 'ps1' : 'sh'}`;
     this.logFile = `${this.configDir}/activity.log`;
     this.cacheManager = new CacheManager(this.configDir);
   }

@@ -124,10 +124,77 @@ export class ClaudeModels {
   async exportAliases(): Promise<void> {
     const models = await this.getModels();
     const config = await this.configManager.loadConfig();
+    const isWin = process.platform === 'win32';
+    const configDir = this.configManager.getConfigDir();
+    const modelsFile = this.configManager.getModelsFile();
+    const logFile = this.configManager.getLogFile();
     const aliasesFile = this.configManager.getAliasesFile();
 
-    const envSetup = `
-# Claude Models CLI - Auto-generated Aliases
+    let aliasScript = '';
+
+    if (isWin) {
+      // PowerShell version
+      aliasScript = `# Claude Models CLI - Auto-generated Aliases
+# Generated: ${new Date().toISOString()}
+# Version: ${config.version}
+
+# Environment setup
+$env:ANTHROPIC_BASE_URL = "https://openrouter.ai/api"
+
+# Ensure auth token is set
+if (-not $env:ANTHROPIC_AUTH_TOKEN -and $env:OPENROUTER_API_KEY) {
+  $env:ANTHROPIC_AUTH_TOKEN = $env:OPENROUTER_API_KEY
+}
+
+`;
+      for (const model of models) {
+        aliasScript += `function global:cm${model.rank} {
+  param([Parameter(ValueFromRemainingArguments=$true)] $args)
+  $env:ANTHROPIC_MODEL = "${model.id}"
+  if ($args.Count -eq 0) {
+    claude
+  } else {
+    claude @args
+  }
+}
+`;
+      }
+
+      aliasScript += `
+function global:cm {
+  param(
+    [Parameter(ValueFromRemainingArguments=$true)]
+    [string[]]$Args
+  )
+  $wrapper = "$env:USERPROFILE\\bin\\cm.ps1"
+  if (-not (Test-Path $wrapper)) {
+    Write-Error "cm wrapper not found at $wrapper. Please ensure the CLI is installed."
+    return 1
+  }
+  & $wrapper @Args
+}
+
+function global:cma {
+  $modelsFile = "${modelsFile}"
+  if (-not (Test-Path $modelsFile)) {
+    Write-Error "No models found. Run 'cm update' first."
+    return 1
+  }
+  $models = Get-Content $modelsFile | ConvertFrom-Json
+  foreach ($model in $models) {
+    $id = $model.id
+    Write-Host "Trying $id..."
+    $env:ANTHROPIC_MODEL = $id
+    claude
+    if ($LASTEXITCODE -eq 0) {
+      break
+    }
+  }
+}
+`;
+    } else {
+      // Bash/zsh/fish version
+      const envSetup = `# Claude Models CLI - Auto-generated Aliases
 # Generated: ${new Date().toISOString()}
 # Version: ${config.version}
 
@@ -140,12 +207,12 @@ if [ -z "$ANTHROPIC_AUTH_TOKEN" ] && [ -n "$OPENROUTER_API_KEY" ]; then
 fi
 `;
 
-    let aliasScript = envSetup + '\n';
+      aliasScript = envSetup + '\n';
 
-    // Generate cm1-cm10 aliases (cm = Claude Models)
-    for (const model of models) {
-      const aliasName = `cm${model.rank}`;
-      aliasScript += `
+      // Generate cm1-cm10 aliases (cm = Claude Models)
+      for (const model of models) {
+        const aliasName = `cm${model.rank}`;
+        aliasScript += `
 function ${aliasName}() {
   export ANTHROPIC_MODEL="${model.id}"
   if [ $# -eq 0 ]; then
@@ -156,38 +223,14 @@ function ${aliasName}() {
 }
 alias ${aliasName}="${aliasName}"
 `;
-    }
+      }
 
-    // Add utility functions
-    aliasScript += `
-function claude-models() {
-  case "$1" in
-    update|--update|-u)
-      cm-update --force
-      ;;
-    list|--list|-l)
-      cm-list
-      ;;
-    providers|--providers|-p)
-      echo "Configured providers: openrouter, ollama, huggingface"
-      ;;
-    config|--config|-c)
-      ${process.platform === 'win32' ? 'notepad' : '${EDITOR:-nano}'} "${this.configManager.getConfigDir()}/config.json"
-      ;;
-    logs|--logs|-L)
-      tail -20 "${this.configManager.getLogFile()}" 2>/dev/null || echo "No logs yet"
-      ;;
-    *)
-      echo "Usage: claude-models [update|list|providers|config|logs]"
-      ;;
-  esac
-}
-
-alias cm="claude-models"
-
-function cla() {
+      // Add utility functions
+      // Add cma auto-fallback function (cm1-cm10 already added)
+      aliasScript += `
+function cma() {
   # Smart launcher with fallback
-  local models=$(cat "${this.configManager.getModelsFile()}" | jq -r '.[] | "\(.rank) \(.id)"' 2>/dev/null || echo "")
+  local models=$(cat "${modelsFile}" | jq -r '.[] | "\(.rank) \(.id)"' 2>/dev/null || echo "")
   if [ -z "$models" ]; then
     echo "No models found. Run 'cm update' first."
     return 1
@@ -202,21 +245,22 @@ function cla() {
   done <<< "$models"
 }
 `;
+    }
 
     // Write the alias script
     await Bun.write(aliasesFile, aliasScript);
 
-    // Also create a symlink or copy to common locations for easy sourcing
-    try {
+    // Suggest how to activate
+    console.log(`\n✅ Aliases exported to: ${aliasesFile}`);
+    if (isWin) {
+      console.log(`📝 Add to your PowerShell profile: Add-Content $PROFILE "source ${aliasesFile}"`);
+      console.log(`   Or run: . ${aliasesFile}`);
+    } else {
       const shellRc = process.env.SHELL?.includes('zsh') ? '~/.zshrc' :
                      process.env.SHELL?.includes('bash') ? '~/.bashrc' :
                      process.env.SHELL?.includes('fish') ? '~/.config/fish/config.fish' :
                      '~/.profile';
-
-      console.log(`\n✅ Aliases exported to: ${aliasesFile}`);
       console.log(`📝 Add to your shell config: echo "source ${aliasesFile}" >> ${shellRc}`);
-    } catch {
-      console.log(`\n✅ Aliases exported to: ${aliasesFile}`);
     }
   }
 
@@ -234,7 +278,7 @@ function cla() {
       console.log(`${rank} ${cyan(id)} ${gray(context)} ${magenta(source)} - ${white(model.description || 'Free tier model')}`);
     }
 
-    console.log('\n💡 Pro tip: Use "cla" to auto-try models until one works');
+    console.log('\n💡 Pro tip: Use "cma" to auto-try models until one works');
   }
 }
 

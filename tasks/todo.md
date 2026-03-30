@@ -58,16 +58,28 @@
 - [x] Clear error messages with suggestions
 - [x] 12 unit tests for validation logic
 
-## 🚧 v1.5.0 - Self-Update Command (In Progress)
+## ✅ v1.4.1 - Cross-Platform Improvements (2026-03-30)
 
-**Spec:** `docs/superpowers/specs/2026-03-28-self-update-command-design.md`
+### Completed
+- [x] PowerShell support for `cm export`
+  - [x] Generate `aliases.ps1` with correct syntax (`$env:VAR`, functions)
+  - [x] Generate `aliases.sh` for Unix (unchanged)
+  - [x] Platform-specific instructions in help and select output
+- [x] Renamed `cla` to `cma` for consistency with `cm` naming
+- [x] Fixed alias recursion bug (removed nested function/alias)
+- [x] Updated all documentation (README, usage-guide, install.ps1, CHANGELOG)
+- [x] Verified: all 27 tests passing
 
+## ✅ v1.5.0 - Self-Update Command (2026-03-30)
+
+**Completed tasks:**
 - [x] Modify `install.sh` to persist `installDir` to `config.json`
 - [x] Validate `installDir?` field in schema (already present in v1.4.0)
-- [ ] Implement `handleSelfUpdate()` in `src/cli.ts`
-- [ ] Write unit tests (`tests/self-update.test.ts`)
-- [ ] Update documentation (README, usage-guide, CHANGELOG)
-- [ ] Release v1.5.0
+- [x] Implement `handleSelfUpdate()` in `src/cli.ts` (already present)
+- [x] Write unit tests (`tests/self-update.test.ts` - 5 passing tests)
+- [x] Update documentation (README, usage-guide, CHANGELOG)
+
+## 🚧 v1.6.0 - Post v1.5.0 Enhancements (Next)
 
 **Implementation Notes:**
 - Added jq-based installDir persistence to `install.sh` after config directory creation (line 83-95)

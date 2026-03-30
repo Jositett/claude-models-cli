@@ -139,9 +139,37 @@ After tag push:
 - ⚠️ No schema migration for config version upgrades
 - ⚠️ Documentation could have more examples
 
+## Lessons from v1.4.1 - Cross-Platform & Naming (2026-03-30)
+
+### 1. Shell Alias Generation Pitfalls
+- **Recursion trap**: Defining `alias cm="claude-models"` and `function claude-models() { cm ... }` causes infinite recursion.
+  - **Solution**: Either use `command cm` to bypass alias/function, or drop the wrapper entirely and rely on users calling `cm` directly from PATH.
+- **Platform-specific syntax**: Bash `export VAR=value` vs PowerShell `$env:VAR = "value"`.
+  - Need separate generation for each shell; can't mix.
+- **PowerShell functions**: Use `function global:Name` for global scope; `param()` for args; `$args` for variadic; `$LASTEXITCODE` for exit code check.
+- **Avoiding `cm` collision**: When defining `cm` as a function, ensure it doesn't shadow itself. In PowerShell, we made `cm` a function that calls the wrapper script directly.
+
+### 2. Documentation Bulk Replace Dangers
+- **Accidental path corruption**: Using `replace_all: true` on the short string `"cla"` replaced occurrences within `.claude-models-cli`, creating broken paths like `.cmaude-models-cli`.
+  - **Rule**: Never use `replace_all` on substrings shorter than 4 characters unless you're 100% sure they're standalone.
+  - **Better**: Use precise, multi-line context matches; or manually verify each replacement; or use regex with word boundaries.
+  - **Always review changes with `git diff`** before committing.
+- **Line ending issues**: Windows CRLF vs Unix LF can affect matching. Use tools that show exact characters.
+
+### 3. Naming Consistency
+- Autocomplete-friendly naming: `cmX` is great; `cla` broke the pattern. Renamed to `cma` (auto) to maintain prefix consistency.
+- Command naming should follow a clear prefix to avoid namespace pollution and improve discoverability.
+
+### 4. Platform Detection
+- Use `process.platform === 'win32'` to detect Windows.
+- For file paths, Node handles `/` on Windows, so prefer forward slashes in generated scripts to avoid escaping issues.
+- In PowerShell generation, use Windows paths with `\` but also consider quoting; using mixed slashes still works.
+
 ## Future Considerations
 - Add Zod for config validation
 - Implement exponential backoff for API retries
 - Add model performance benchmarking
 - Create VS Code extension for GUI
 - Consider Tauri for desktop app
+- **Add multi-command test coverage**: Write integration tests that load generated alias files and verify they work correctly.
+- **Consider shell detection heuristics**: For `.profile` vs `.bashrc` vs `.zshrc`, rely on `$SHELL` env var but fall back gracefully.

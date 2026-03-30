@@ -32,7 +32,7 @@ This contacts OpenRouter, filters for free models, and ranks them based on progr
 ### 3. Generate Shortcuts
 
 ```bash
-# Create cm1-cm10 shortcuts and cla auto-fallback
+# Create cm1-cm10 shortcuts and cma auto-fallback
 cm export
 
 # Add to your shell configuration (one-time)
@@ -47,8 +47,8 @@ source ~/.bashrc  # or source ~/.zshrc
 
 ```bash
 cm1  # Launch #1 ranked model (usually Qwen3-32B-Coder)
-# or use cla to auto-try models until one succeeds
-cla
+# or use cma to auto-try models until one succeeds
+cma
 ```
 
 ## Daily Usage
@@ -66,12 +66,12 @@ cm3    # Third best
 
 **How it works:** Each shortcut sets the `ANTHROPIC_MODEL` environment variable and runs `claude`. The model ID comes from OpenRouter.
 
-### Smart Fallback: `cla`
+### Smart Fallback: `cma`
 
 When you hit rate limits or a model is unavailable, use:
 
 ```bash
-cla    # Tries cm1, falls back to cm2, cm3, etc.
+cma    # Tries cm1, falls back to cm2, cm3, etc.
 ```
 
 This automatically cycles through ranked models until one accepts your request. Great for:
@@ -105,6 +105,24 @@ cm logs
 
 # Edit configuration
 cm config
+
+### Updating the CLI
+
+```bash
+# Check for and install updates (v1.5.0+)
+cm self-update
+
+# Dry-run: check without installing
+cm self-update --dry-run
+
+# JSON output: for scripting
+cm self-update --json
+```
+
+**How it works:** `cm self-update` uses git to fetch the latest version from GitHub, rebuilds the project with `bun install && bun run build`, and replaces the current installation. It requires a git-based install (which the official installers create).
+
+If you don't have a git installation, you'll see a helpful message telling you to re-run the install script.
+
 ```
 
 ## Configuration
@@ -187,7 +205,7 @@ cm update
 
 ### Rate limits hit
 
-OpenRouter free tier has limits. Use `cla` for automatic fallback, or wait a few hours. You can also add more API keys or use different providers.
+OpenRouter free tier has limits. Use `cma` for automatic fallback, or wait a few hours. You can also add more API keys or use different providers.
 
 ### Windows path issues
 

@@ -92,7 +92,7 @@ Write-Host "3. Fetch models:" -ForegroundColor White
 Write-Host "   cm update" -ForegroundColor Gray
 Write-Host "4. Generate aliases:" -ForegroundColor White
 Write-Host "   cm export" -ForegroundColor Gray
-Write-Host "   source ~/.claude-models-cli/aliases.sh" -ForegroundColor Gray
+Write-Host "   . `$env:USERPROFILE\.claude-models-cli\aliases.ps1" -ForegroundColor Gray
 Write-Host "`nOr for PowerShell profile:" -ForegroundColor Cyan
 Write-Host "   Add-Content `$PROFILE \"source `$env:USERPROFILE\.claude-models-cli\aliases.ps1\"" -ForegroundColor Gray
 Write-Host "`n📖 See README.md for full documentation" -ForegroundColor Magenta

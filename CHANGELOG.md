@@ -8,22 +8,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-- N/A
+- **PowerShell support**: `cm export` now generates platform-specific aliases
+  - Windows: `aliases.ps1` with PowerShell syntax (`$env:VAR`, functions)
+  - Unix: `aliases.sh` with bash/zsh/fish syntax (unchanged)
+  - Help text and `cm select` output now show platform-specific instructions
+- **Consistent command naming**: Renamed `cla` to `cma` to follow the `cm` convention
+- **Self-update command**: `cm self-update` to update the CLI to latest version
+  - Supports `--dry-run` to check without installing
+  - Supports `--json` for machine-readable output
+  - Git-based installation detection with helpful error messages
 
 ### Changed
-- N/A
+- Simplified alias generation: Removed recursive `claude-models` function; `cm` now directly invokes the wrapper script
+- Updated all documentation to reflect `cma` naming
 
-### Deprecated
-- N/A
-
-### Removed
-- N/A
+### Testing
+- Added unit tests for self-update helpers (5 tests passing)
 
 ### Fixed
-- N/A
-
-### Security
-- N/A
+- Fixed PowerShell environment variable syntax errors (was using bash `export` on Windows)
+- Fixed potential infinite recursion in bash alias definitions
 
 ## [1.4.0] - 2026-03-23
 

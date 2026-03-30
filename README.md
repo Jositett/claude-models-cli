@@ -23,6 +23,7 @@ Built with [Bun](https://bun.sh) for maximum performance and compatibility acros
 - 🔍 **Model probing** - test which models actually work (`cm probe`)
 - 📊 **Activity logging** and usage tracking
 - 🛠️ **Smart defaults** for coding tasks
+- 🔄 **Self-update** - `cm self-update` to stay current
 - 🌍 **Cross-platform** - works on macOS, Linux, and Windows
 - 📄 **JSON output** for scripting and automation (`cm list --json`)
 - ℹ️ **Environment info** with `cm info` for debugging
@@ -64,7 +65,7 @@ export OPENROUTER_API_KEY="sk-or-v1-..."
 # Fetch latest free models
 cm update
 
-# Generate shell aliases (cm1-cm10, cla)
+# Generate shell aliases (cm1-cm10, cma)
 cm export
 
 # Source the aliases (add to ~/.bashrc, ~/.zshrc, or ~/.config/fish/config.fish)
@@ -78,7 +79,7 @@ cm2    # Launch #2 model
 cm3    # Launch #3 model
 # ... up to cm10
 
-cla    # Auto-try models until one works (smart fallback for rate limits)
+cma    # Auto-try models until one works (smart fallback for rate limits)
 ```
 
 ### Management
@@ -110,6 +111,16 @@ cm select
 ```
 
 Opens a text-based UI to choose a model interactively. Navigate with arrow keys and press Enter to launch your selected model. This is useful when you want to preview all available models with full details before choosing.
+
+### Self-Update
+
+```bash
+cm self-update        # Check and update to latest version
+cm self-update --dry-run  # Check for updates without installing
+cm self-update --json      # Machine-readable output
+```
+
+The self-update command uses git to pull the latest changes from the repository and rebuilds the CLI. It works only for git-based installations (the standard install via `install.sh` or `install.ps1`). If you installed manually, you'll need to re-run the install script.
 
 ## Providers
 

@@ -178,6 +178,10 @@ async function main() {
       await handleSelect(cm, args);
       break;
 
+    case 'self-update':
+      await handleSelfUpdate(cm, args);
+      break;
+
     case 'help':
     case '--help':
     case '-h':
@@ -199,7 +203,7 @@ function printModels(models: any[]) {
     console.log(`${rank} ${cyan(id)} ${gray(context)} ${magenta(source)} - ${white(model.description || 'Free tier model')}`);
   }
 
-  console.log('\n💡 Pro tip: Use "cla" to auto-try models until one works');
+  console.log('\n💡 Pro tip: Use "cma" to auto-try models until one works');
 }
 
 function printEnvInfo(cm: ClaudeModels) {
@@ -221,6 +225,17 @@ function printEnvInfo(cm: ClaudeModels) {
 }
 
 function printHelp() {
+  const isWin = process.platform === 'win32';
+  const apiKeyExample = isWin ? '$env:OPENROUTER_API_KEY = "sk-or-v1-..."' : 'export OPENROUTER_API_KEY="sk-or-v1-..."';
+  let aliasFile, sourceCmd;
+  if (isWin) {
+    aliasFile = 'aliases.ps1';
+    sourceCmd = `. $env:USERPROFILE\\.claude-models-cli\\${aliasFile}`;
+  } else {
+    aliasFile = 'aliases.sh';
+    sourceCmd = `source ~/.claude-models-cli/${aliasFile}`;
+  }
+
   console.log(`
 🚀 Claude Models CLI v${PKG_VERSION} - Cross-platform model manager
 
@@ -235,13 +250,15 @@ Commands:
   config, -c          Edit configuration file (default)
                       Subcommands: edit (default), validate
   logs, -L            View recent activity logs
-  export, -e          Generate shell aliases (cm1-cm10, cla)
+  export, -e          Generate shell aliases (cm1-cm10, cma)
   version, -v         Show version
   info, -i            Show environment information
   cache               Manage model cache
                       Subcommands: clear, stats
   probe, scan         Test models to see which ones actually work
                       Options: --limit N (default 10), --force, --json
+  self-update         Update the CLI to latest version
+                      Options: --dry-run (check only), --json
   help, -h            Show this help message
 
 Options:
@@ -250,19 +267,19 @@ Options:
 
 Quick Start:
   1. Set your API key:
-     export OPENROUTER_API_KEY="sk-or-v1-..."
+     ${apiKeyExample}
 
   2. Fetch models:
      cm update
 
   3. Generate aliases:
      cm export
-     source ~/.claude-models-cli/aliases.sh
+     ${sourceCmd}
 
   4. Launch models:
      cm1    # Launch #1 ranked model
      cm2    # Launch #2 model
-     cla    # Auto-try models until one works
+     cma    # Auto-try models until one works
 
 Providers:
   OpenRouter  ✅ Active - 10+ free models
@@ -434,16 +451,72 @@ async function handleSelect(cm: ClaudeModels, args: string[]) {
 
       // Set as environment variable for current session
       console.log(`\n💡 To use this model, run:`);
-      console.log(`   export ANTHROPIC_MODEL="${selected.id}"`);
-      console.log(`   claude`);
-
-      // Also create a quick alias file suggestion
-      const aliasName = `cm-selected`;
-      console.log(`\n📝 Or create a shortcut:`);
-      console.log(`   function ${aliasName}() { export ANTHROPIC_MODEL="${selected.id}"; claude "$@"; }`);
+      if (process.platform === 'win32') {
+        console.log(`   $env:ANTHROPIC_MODEL = "${selected.id}"`);
+        console.log(`   claude`);
+        console.log(`\n📝 Or create a shortcut:`);
+        console.log(`   function global:cm-selected { $env:ANTHROPIC_MODEL = "${selected.id}"; claude @args }`);
+      } else {
+        console.log(`   export ANTHROPIC_MODEL="${selected.id}"`);
+        console.log(`   claude`);
+        console.log(`\n📝 Or create a shortcut:`);
+        console.log(`   function cm-selected() { export ANTHROPIC_MODEL="${selected.id}"; claude "$@"; }`);
+      }
     }
   } catch (error: any) {
     console.error('❌ Selection failed:', error.message);
+  }
+}
+
+async function handleSelfUpdate(cm: ClaudeModels, args: string[]): Promise<void> {
+  console.log('=== SELF_UPDATE START ===');
+  const configManager = (cm as any).configManager;
+  const jsonFlag = args.includes('--json') || args.includes('-j');
+  const dryRunFlag = args.includes('--dry-run');
+
+  try {
+    const installDir = getInstallDir(configManager);
+    const result = await runGitUpdate(installDir, dryRunFlag);
+
+    // Log to activity
+    if (result.success) {
+      if (result.action === 'updated') {
+        await configManager.log(`Self-update: ${result.oldVersion} → ${result.newVersion} (${result.newCommit})`);
+      } else if (result.action === 'already-latest') {
+        await configManager.log(`Self-update: already on latest (${result.oldVersion})`);
+      } else {
+        await configManager.log(`Self-update: ${result.action}`);
+      }
+    } else {
+      await configManager.log(`Self-update: failed - ${result.error}`);
+    }
+
+    // Output
+    if (jsonFlag) {
+      console.log(JSON.stringify(result, null, 2));
+    } else {
+      if (result.success) {
+        if (result.action === 'updated') {
+          console.log(`✅ Updated from v${result.oldVersion} (${result.oldCommit}) to v${result.newVersion} (${result.newCommit})`);
+        } else if (result.action === 'already-latest') {
+          console.log(`✅ You're already on the latest version (v${result.oldVersion})`);
+        } else if (result.action === 'not-git') {
+          console.log(`⚠️  You don't have a git-based installation.`);
+          console.log(`Please re-run the install script from the README to update.`);
+        }
+      } else {
+        console.error(`❌ Update failed:`);
+        console.error(result.error);
+        process.exit(1);
+      }
+    }
+  } catch (error: any) {
+    if (jsonFlag) {
+      console.error(JSON.stringify({ success: false, error: error.message }));
+    } else {
+      console.error('❌ Unexpected error:', error.message);
+    }
+    process.exit(1);
   }
 }
 
@@ -494,6 +567,10 @@ async function checkGitAvailable(): Promise<boolean> {
 async function getGitInfo(installDir: string): Promise<{ version: string; commit: string } | null> {
   try {
     const pkgPath = resolve(installDir, 'package.json');
+    // Quick sync check to avoid hanging on non-existent file
+    if (!existsSync(pkgPath)) {
+      return null;
+    }
     const pkgContent = await Bun.file(pkgPath).text();
     const pkg = JSON.parse(pkgContent);
 
