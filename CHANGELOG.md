@@ -32,13 +32,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-- N/A
+- **Better help**: `cm --help` now includes practical usage examples showing common workflows and command combinations
+- **NO_COLOR support**: When `NO_COLOR` environment variable is set, all colored output is disabled (standard accessibility compliance)
 
 ### Changed
-- N/A
+- Color functions now check `NO_COLOR` on each call (dynamic updates)
+- Probe status indicators (✓/✗/?) in `cm select` respect `NO_COLOR`
 
-### Fixed
-- N/A
+### Testing
+- Added unit tests for NO_COLOR behavior (2 tests passing)
 
 ## [1.4.0] - 2026-03-23
 
