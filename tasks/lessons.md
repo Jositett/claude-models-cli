@@ -165,6 +165,17 @@ After tag push:
 - For file paths, Node handles `/` on Windows, so prefer forward slashes in generated scripts to avoid escaping issues.
 - In PowerShell generation, use Windows paths with `\` but also consider quoting; using mixed slashes still works.
 
+### 5. Release Process & Versioning
+- **Version bump before tagging**: The commit that receives the version tag must have the updated version number in `package.json` and `src/version.ts`. Either include the version bump in the same commit as the release changes, or create a separate version bump commit and tag that commit.
+- **Manual releases without CI**: When GitHub Actions billing is disabled:
+  - Build the project locally (`bun run build`)
+  - Create an annotated tag: `git tag -a vX.Y.Z -m "Release vX.Y.Z: notes"`
+  - Push tag: `git push origin vX.Y.Z`
+  - Use `gh release create vX.Y.Z --title "vX.Y.Z" --notes-file <file>` to create GitHub release with assets
+  - Manually upload built assets if no CI to auto-generate them
+- **Tag correction**: If you tag the wrong commit, delete and recreate the tag (local and remote) — be mindful of collaborators who may have pulled the tag.
+- **Release notes**: Keep a curated Unreleased section in CHANGELOG and copy it to the release. This ensures consistency between the tag and documentation.
+
 ## Future Considerations
 - Add Zod for config validation
 - Implement exponential backoff for API retries

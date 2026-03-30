@@ -91,9 +91,9 @@
 ---
 
 ## Current Status
-- ✅ **v1.4.0** - Latest release with config validation
-- ⚠️ GitHub Actions: Billing lock prevents CI runners (workflow exists)
-- 🎯 Next: Future enhancements (see backlog)
+- ✅ **v1.5.0** - Latest release (2026-03-30): Self-update, PowerShell support, cma naming
+- ⚠️ GitHub Actions: Billing lock prevents CI runners (workflow exists). Manual releases used.
+- 🎯 Next: v1.6.0 enhancements (see backlog)
 
 ## Completed (v1.1.0)
 - [x] **Model caching** (cache.ts, cm1-cm10, cache commands)
