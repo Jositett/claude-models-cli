@@ -281,6 +281,31 @@ Quick Start:
      cm2    # Launch #2 model
      cma    # Auto-try models until one works
 
+Examples:
+  # Interactive model selection with probe status
+  cm probe --limit 10
+  cm select --only-working
+
+  # Cache management
+  cm cache stats    # Show cache usage
+  cm cache clear    # Clear cached models
+
+  # Get machine-readable output for scripting
+  cm list --json | jq -r '.[0].id'
+
+  # Update the CLI (dry-run first)
+  cm self-update --dry-run
+  cm self-update
+
+  # View recent activity logs
+  cm logs
+
+  # Validate configuration
+  cm config validate
+
+  # Edit config file
+  ${isWin ? 'cm config edit' : '${EDITOR:-nano} ~/.claude-models-cli/config.json'}
+
 Providers:
   OpenRouter  ✅ Active - 10+ free models
   Ollama      🚧 Planned - Local models
