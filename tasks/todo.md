@@ -104,10 +104,10 @@
 
 ### Priority 1: Quality of Life
 - [x] **Model caching**: Reduce OpenRouter API calls with local cache
-- [ ] **Config validation**: JSON schema for config.json
-- [x] **Retry logic**: Exponential backoff for transient failures
-- [ ] **Better help**: Add examples to `cm --help`
-- [ ] **Installation verification**: Check Bun dependency before install
+- [x] **Config validation**: JSON schema for config.json (v1.4.0)
+- [x] **Retry logic**: Exponential backoff for transient failures (v1.3.0)
+- [x] **Better help**: Add practical examples to `cm --help` (v1.5.1)
+- [x] **Installation verification**: Check Bun dependency before install (already in install.sh/install.ps1)
 
 ### Priority 2: Provider Enhancements
 - [ ] **Ollama**: Test and document local model usage
